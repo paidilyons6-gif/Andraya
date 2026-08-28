@@ -15,17 +15,17 @@ export function Testimonials() {
       const cards = sectionRef.current.querySelectorAll('.testimonial-card')
       cards.forEach((card, i) => {
         gsap.from(card, {
-          x: i % 2 === 0 ? -48 : 48,
-          y: 32,
+          x: i % 2 === 0 ? -56 : 56,
+          y: 40,
           opacity: 0,
-          duration: 0.9,
+          duration: 1,
           ease: 'power3.out',
           scrollTrigger: {
             trigger: card,
             start: 'top 88%',
             once: true,
           },
-          delay: i * 0.1,
+          delay: i * 0.12,
         })
       })
     },
@@ -51,33 +51,41 @@ export function Testimonials() {
   ]
 
   return (
-    <section ref={sectionRef} className="py-20 lg:py-28">
-      <div className="mx-auto max-w-6xl px-6 lg:px-8">
+    <section
+      ref={sectionRef}
+      className="relative overflow-hidden py-20 lg:py-28"
+      style={{
+        background: 'linear-gradient(135deg, #f4e8d8 0%, #e8c4a8 40%, #d4957a 100%)',
+      }}
+    >
+      <div className="paper-grain pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-multiply" />
+      <div className="relative mx-auto max-w-6xl px-6 lg:px-8">
         <div className="text-center">
-          <p className="text-sm font-medium uppercase tracking-[0.25em] text-accent">Kind words</p>
+          <p className="text-sm font-bold uppercase tracking-[0.3em] text-copper-deep">Kind words</p>
           <AnimatedText
             as="h2"
-            className="mt-3 font-serif text-4xl font-medium tracking-tight text-ink"
+            className="mt-3 font-serif text-4xl font-medium tracking-tight text-ink-dark sm:text-5xl"
           >
             What our clients say
           </AnimatedText>
         </div>
         <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {quotes.map((quote) => (
+          {quotes.map((quote, i) => (
             <blockquote
               key={quote.author}
-              className="testimonial-card rounded-2xl border border-border bg-paper p-8"
+              className="testimonial-card rounded-2xl border border-white/40 bg-white/50 p-8 shadow-xl shadow-copper/10 backdrop-blur-md"
+              style={{ transform: i === 1 ? 'translateY(1rem)' : undefined }}
             >
-              <svg className="h-8 w-8 text-accent/30" fill="currentColor" viewBox="0 0 32 32">
+              <svg className="h-10 w-10 text-copper/40" fill="currentColor" viewBox="0 0 32 32">
                 <path d="M10 8c-3.3 0-6 2.7-6 6v10h10V14H8c0-1.1.9-2 2-2V8zm14 0c-3.3 0-6 2.7-6 6v10h10V14H22c0-1.1.9-2 2-2V8z" />
               </svg>
-              <p className="mt-4 font-serif text-lg italic leading-relaxed text-ink-muted">
+              <p className="mt-4 font-serif text-lg italic leading-relaxed text-ink-dark/80">
                 "{quote.text}"
               </p>
-              <footer className="mt-6">
+              <footer className="mt-6 border-t border-copper/20 pt-4">
                 <cite className="not-italic">
-                  <span className="font-medium text-ink">{quote.author}</span>
-                  <span className="block text-sm text-ink-faint">{quote.location}</span>
+                  <span className="font-semibold text-ink-dark">{quote.author}</span>
+                  <span className="block text-sm text-ink-dark/55">{quote.location}</span>
                 </cite>
               </footer>
             </blockquote>

@@ -78,8 +78,8 @@ export function PenCursor() {
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path
             d="M4 20 L4 4 L14 14 L10 14 L16 20 Z"
-            fill="#1c1917"
-            stroke="#1c1917"
+            fill="#d4a853"
+            stroke="#f0c674"
             strokeWidth="0.5"
           />
         </svg>

@@ -16,6 +16,7 @@ const sections = ['#how-it-works', '#styles', '#gallery', '#order', '#faq']
 export function Header() {
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState('')
+  const [scrolled, setScrolled] = useState(false)
   const headerRef = useRef<HTMLElement>(null)
   const indicatorRef = useRef<HTMLSpanElement>(null)
 
@@ -34,20 +35,13 @@ export function Header() {
 
       ScrollTrigger.create({
         start: 0,
-        end: 150,
-        onUpdate: (self) => {
-          const p = self.progress
-          gsap.set(header, {
-            backgroundColor: `rgba(247, 244, 239, ${0.85 + p * 0.1})`,
-            boxShadow: p > 0.1 ? '0 4px 24px rgba(28,25,23,0.08)' : 'none',
-          })
-        },
+        end: 200,
+        onUpdate: (self) => setScrolled(self.progress > 0.15),
       })
 
       sections.forEach((id) => {
         const el = document.querySelector(id)
         if (!el) return
-
         ScrollTrigger.create({
           trigger: el,
           start: 'top center',
@@ -64,16 +58,10 @@ export function Header() {
     () => {
       const indicator = indicatorRef.current
       if (!indicator || !active) return
-
       const link = document.querySelector(`[data-nav="${active}"]`)
-      if (!link) return
-
-      const nav = link.parentElement
-      if (!nav) return
-
+      if (!link?.parentElement) return
       const linkRect = link.getBoundingClientRect()
-      const navRect = nav.getBoundingClientRect()
-
+      const navRect = link.parentElement.getBoundingClientRect()
       gsap.to(indicator, {
         x: linkRect.left - navRect.left,
         width: linkRect.width,
@@ -96,12 +84,16 @@ export function Header() {
   return (
     <header
       ref={headerRef}
-      className="sticky top-0 z-50 border-b border-border/60 bg-cream/70 backdrop-blur-md"
+      className={`sticky top-0 z-50 transition-all duration-500 ${
+        scrolled ? 'glass-dark border-b border-border shadow-lg shadow-black/20' : 'bg-transparent'
+      }`}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 lg:px-8">
-        <a href="#" className="group flex items-baseline gap-1.5">
-          <span className="font-serif text-2xl font-semibold tracking-tight text-ink">Andraya</span>
-          <span className="hidden text-xs font-medium uppercase tracking-[0.2em] text-ink-faint sm:inline">
+        <a href="#" className="group flex items-baseline gap-2">
+          <span className="font-serif text-2xl font-semibold tracking-tight text-parchment group-hover:text-gold-bright transition-colors">
+            Andraya
+          </span>
+          <span className="hidden text-[10px] font-bold uppercase tracking-[0.25em] text-gold/70 sm:inline">
             Studio
           </span>
         </a>
@@ -109,7 +101,7 @@ export function Header() {
         <nav className="relative hidden items-center gap-8 md:flex">
           <span
             ref={indicatorRef}
-            className="absolute -bottom-1 h-0.5 rounded-full bg-accent opacity-0"
+            className="absolute -bottom-1 h-px bg-gradient-to-r from-transparent via-gold to-transparent opacity-0"
             aria-hidden="true"
           />
           {links.map((link) => (
@@ -118,7 +110,7 @@ export function Header() {
               data-nav={link.href}
               href={link.href}
               className={`text-sm font-medium transition-colors ${
-                active === link.href ? 'text-ink' : 'text-ink-muted hover:text-ink'
+                active === link.href ? 'text-gold-bright' : 'text-parchment-muted hover:text-parchment'
               }`}
             >
               {link.label}
@@ -126,7 +118,7 @@ export function Header() {
           ))}
           <MagneticButton
             href="#order"
-            className="rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-cream transition-colors hover:bg-ink/90"
+            className="rounded-full border border-gold/50 bg-gold/10 px-5 py-2.5 text-sm font-semibold text-gold-bright backdrop-blur-sm transition-all hover:border-gold hover:bg-gold/20 hover:shadow-[0_0_20px_rgba(212,168,83,0.3)]"
           >
             Commission Yours
           </MagneticButton>
@@ -138,20 +130,20 @@ export function Header() {
           aria-label="Toggle menu"
           onClick={() => setOpen(!open)}
         >
-          <span className={`block h-0.5 w-6 bg-ink transition-transform ${open ? 'translate-y-2 rotate-45' : ''}`} />
-          <span className={`block h-0.5 w-6 bg-ink transition-opacity ${open ? 'opacity-0' : ''}`} />
-          <span className={`block h-0.5 w-6 bg-ink transition-transform ${open ? '-translate-y-2 -rotate-45' : ''}`} />
+          <span className={`block h-0.5 w-6 bg-parchment transition-transform ${open ? 'translate-y-2 rotate-45' : ''}`} />
+          <span className={`block h-0.5 w-6 bg-parchment transition-opacity ${open ? 'opacity-0' : ''}`} />
+          <span className={`block h-0.5 w-6 bg-parchment transition-transform ${open ? '-translate-y-2 -rotate-45' : ''}`} />
         </button>
       </div>
 
       {open && (
-        <nav className="border-t border-border bg-cream px-6 py-4 md:hidden">
+        <nav className="glass-dark border-t border-border px-6 py-4 md:hidden">
           <div className="flex flex-col gap-4">
             {links.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className={`text-base font-medium ${active === link.href ? 'text-ink' : 'text-ink-muted'}`}
+                className={`text-base font-medium ${active === link.href ? 'text-gold-bright' : 'text-parchment-muted'}`}
                 onClick={() => setOpen(false)}
               >
                 {link.label}
@@ -159,7 +151,7 @@ export function Header() {
             ))}
             <a
               href="#order"
-              className="rounded-full bg-ink px-5 py-3 text-center text-sm font-medium text-cream"
+              className="rounded-full bg-gradient-to-r from-copper to-gold py-3 text-center text-sm font-bold text-midnight"
               onClick={() => setOpen(false)}
             >
               Commission Yours

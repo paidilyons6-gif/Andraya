@@ -130,7 +130,7 @@ export function HowItWorks() {
   )
 
   return (
-    <section id="how-it-works" ref={sectionRef} className="relative border-y border-border bg-paper py-20 lg:py-28">
+    <section id="how-it-works" ref={sectionRef} className="section-parchment relative overflow-hidden py-20 lg:py-28">
       <svg
         className="pointer-events-none absolute inset-x-0 top-1/2 hidden h-24 w-full -translate-y-1/2 lg:block"
         preserveAspectRatio="none"
@@ -140,7 +140,7 @@ export function HowItWorks() {
           ref={lineRef}
           d="M80 48 Q400 20 720 48 Q1040 76 1360 48"
           fill="none"
-          stroke="#b45309"
+          stroke="#b8653a"
           strokeWidth="2"
           strokeDasharray="6 8"
           opacity="0.5"
@@ -149,14 +149,14 @@ export function HowItWorks() {
 
       <div className="relative mx-auto max-w-6xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-medium uppercase tracking-[0.25em] text-accent">Simple process</p>
+          <p className="text-sm font-bold uppercase tracking-[0.3em] text-copper">Simple process</p>
           <AnimatedText
             as="h2"
-            className="mt-3 font-serif text-4xl font-medium tracking-tight text-ink sm:text-5xl"
+            className="mt-3 font-serif text-4xl font-medium tracking-tight text-ink-dark sm:text-5xl"
           >
             How it works
           </AnimatedText>
-          <p className="mt-4 text-lg text-ink-muted">
+          <p className="mt-4 text-lg text-ink-dark/70">
             From your doorstep to your wall in four easy steps.
           </p>
         </div>
@@ -164,15 +164,15 @@ export function HowItWorks() {
         <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((step) => (
             <div key={step.number} className="step-card group relative">
-              <div className="relative rounded-2xl border border-border bg-cream p-6 transition-shadow hover:shadow-lg hover:shadow-ink/5">
+              <div className="relative rounded-2xl border border-copper/20 bg-white/60 p-6 shadow-lg shadow-copper/5 backdrop-blur-sm transition-all hover:border-gold/40 hover:shadow-xl hover:shadow-gold/10">
                 <div className="mb-4 flex items-center justify-between">
-                  <span className="font-serif text-sm font-medium text-accent">{step.number}</span>
-                  <div className="step-icon rounded-full bg-cream-dark p-2.5 text-ink-muted transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">
+                  <span className="font-serif text-sm font-bold text-copper">{step.number}</span>
+                  <div className="step-icon rounded-full bg-gradient-to-br from-gold/20 to-copper/10 p-2.5 text-copper transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">
                     {step.icon}
                   </div>
                 </div>
-                <h3 className="font-serif text-xl font-semibold text-ink">{step.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink-muted">{step.description}</p>
+                <h3 className="font-serif text-xl font-semibold text-ink-dark">{step.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-ink-dark/65">{step.description}</p>
               </div>
             </div>
           ))}
