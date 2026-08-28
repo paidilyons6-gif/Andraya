@@ -54,16 +54,16 @@ export function FAQ() {
   )
 
   return (
-    <section id="faq" ref={sectionRef} className="section-parchment relative py-20 lg:py-28">
+    <section id="faq" ref={sectionRef} className="section-studio py-20 lg:py-24">
       <div className="mx-auto max-w-3xl px-6 lg:px-8">
         <div className="text-center">
-          <p className="text-sm font-bold uppercase tracking-[0.3em] text-copper">FAQ</p>
-          <AnimatedText as="h2" className="mt-3 font-serif text-4xl font-medium tracking-tight text-ink-dark">
+          <p className="text-sm text-ink-faint">FAQ</p>
+          <AnimatedText as="h2" className="mt-2 font-serif text-3xl font-medium text-ink sm:text-4xl">
             Common questions
           </AnimatedText>
         </div>
 
-        <div className="mt-12 divide-y divide-copper/15 rounded-2xl border border-copper/20 bg-white/50 shadow-xl shadow-copper/5 backdrop-blur-sm">
+        <div className="mt-12 divide-y divide-border border border-border bg-paper">
           {faqs.map((faq, i) => (
             <div key={faq.q} className="faq-item">
               <button
@@ -72,9 +72,9 @@ export function FAQ() {
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
                 aria-expanded={openIndex === i}
               >
-                <span className="font-medium text-ink-dark">{faq.q}</span>
+                <span className="font-medium text-ink">{faq.q}</span>
                 <svg
-                  className={`h-5 w-5 shrink-0 text-copper transition-transform duration-300 ${openIndex === i ? 'rotate-180' : ''}`}
+                  className={`h-5 w-5 shrink-0 text-ink-muted transition-transform duration-300 ${openIndex === i ? 'rotate-180' : ''}`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -89,7 +89,7 @@ export function FAQ() {
                 className="overflow-hidden px-6"
                 style={{ height: i === 0 ? 'auto' : 0, opacity: i === 0 ? 1 : 0 }}
               >
-                <p className="pb-5 text-sm leading-relaxed text-ink-dark/70">{faq.a}</p>
+                <p className="pb-5 text-sm leading-relaxed text-ink-muted">{faq.a}</p>
               </div>
             </div>
           ))}

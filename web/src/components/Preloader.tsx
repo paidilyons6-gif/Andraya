@@ -27,9 +27,9 @@ export function Preloader({ onComplete }: { onComplete: () => void }) {
         },
       })
 
-      tl.from(path, { drawSVG: '0%', duration: 1.6, ease: 'power2.inOut' })
-        .from('.preloader-text', { opacity: 0, y: 16, duration: 0.6, stagger: 0.1 }, '-=0.5')
-        .to(overlay, { opacity: 0, duration: 0.7, delay: 0.4 })
+      tl.from(path, { drawSVG: '0%', duration: 1.4, ease: 'power2.inOut' })
+        .from('.preloader-text', { opacity: 0, y: 12, duration: 0.5, stagger: 0.08 }, '-=0.4')
+        .to(overlay, { opacity: 0, duration: 0.6, delay: 0.3 })
     },
     { dependencies: [motionEnabled] },
   )
@@ -39,33 +39,26 @@ export function Preloader({ onComplete }: { onComplete: () => void }) {
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-[100] flex cursor-pointer flex-col items-center justify-center"
-      style={{
-        background: 'radial-gradient(ellipse at center, #151922 0%, #0c0f14 100%)',
-      }}
+      className="fixed inset-0 z-[100] flex cursor-pointer flex-col items-center justify-center bg-paper"
       onClick={() => {
         setVisible(false)
         onComplete()
       }}
       role="presentation"
     >
-      <div
-        className="absolute h-48 w-48 rounded-full opacity-30 blur-3xl"
-        style={{ background: 'radial-gradient(circle, rgba(212,168,83,0.5) 0%, transparent 70%)' }}
-      />
-      <svg width="140" height="110" viewBox="0 0 120 100" aria-hidden="true" className="relative">
+      <svg width="140" height="110" viewBox="0 0 120 100" aria-hidden="true">
         <path
           ref={pathRef}
           d="M15 75 L60 20 L105 75 M35 75 V55 H85 V75"
           fill="none"
-          stroke="#d4a853"
+          stroke="#9c4a32"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
       </svg>
-      <p className="preloader-text relative mt-8 font-serif text-2xl text-gradient-gold">Andraya Studio</p>
-      <p className="preloader-text relative mt-2 text-xs uppercase tracking-[0.35em] text-parchment-muted">
+      <p className="preloader-text mt-8 font-serif text-2xl text-ink">Andraya Studio</p>
+      <p className="preloader-text mt-2 text-xs uppercase tracking-[0.3em] text-ink-faint">
         Tap to skip
       </p>
     </div>

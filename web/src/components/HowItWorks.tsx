@@ -6,123 +6,39 @@ import { useMotionEnabled } from '../hooks/useMotionEnabled'
 
 const steps = [
   {
-    number: '01',
-    title: 'Share your photo',
-    description:
-      'Upload a clear front-facing photo of your home. Include the full facade, good lighting, and minimal obstructions like parked cars.',
-    icon: (
-      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={1.5}
-          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-        />
-      </svg>
-    ),
+    number: '1',
+    title: 'Send a photo',
+    description: 'A clear shot of the front of your house, taken in daylight. That is all we need to get started.',
   },
   {
-    number: '02',
-    title: 'Choose your style',
-    description:
-      'Pick from our line drawing, shaded, or full-color options. Select your size and any add-ons like digital files or extra copies.',
-    icon: (
-      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={1.5}
-          d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-        />
-      </svg>
-    ),
+    number: '2',
+    title: 'Pick a style',
+    description: 'Line drawing, shading, or color. Choose your print size. We will confirm everything before you pay.',
   },
   {
-    number: '03',
-    title: 'We draw by hand',
-    description:
-      'Our artists study every architectural detail — windows, trim, landscaping — and create your portrait with care and precision.',
-    icon: (
-      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={1.5}
-          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-        />
-      </svg>
-    ),
+    number: '3',
+    title: 'We draw it',
+    description: 'Our artists work from your photo, by hand. One round of revisions is included if something needs adjusting.',
   },
   {
-    number: '04',
-    title: 'Receive your artwork',
-    description:
-      'Your finished illustration arrives ready to frame — a personal piece you will cherish for years, or give as a meaningful gift.',
-    icon: (
-      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={1.5}
-          d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-        />
-      </svg>
-    ),
+    number: '4',
+    title: 'It arrives',
+    description: 'Your print ships ready to frame. You also get a high-resolution digital file.',
   },
 ]
 
 export function HowItWorks() {
   const sectionRef = useRef<HTMLElement>(null)
-  const lineRef = useRef<SVGPathElement>(null)
   const motionEnabled = useMotionEnabled()
 
   useGSAP(
     () => {
       if (!motionEnabled) return
-
       ScrollTrigger.batch('.step-card', {
-        start: 'top 85%',
+        start: 'top 88%',
         once: true,
         onEnter: (batch) => {
-          gsap.from(batch, {
-            y: 56,
-            opacity: 0,
-            duration: 0.85,
-            stagger: 0.12,
-            ease: 'back.out(1.2)',
-          })
-          batch.forEach((el) => {
-            const icon = el.querySelector('.step-icon')
-            if (icon) {
-              gsap.from(icon, {
-                rotation: -20,
-                scale: 0.6,
-                duration: 0.6,
-                ease: 'back.out(2)',
-                delay: 0.1,
-              })
-            }
-          })
-        },
-      })
-    },
-    { scope: sectionRef, dependencies: [motionEnabled] },
-  )
-
-  useGSAP(
-    () => {
-      if (!motionEnabled || !lineRef.current || !sectionRef.current) return
-      if (window.innerWidth < 1024) return
-
-      gsap.from(lineRef.current, {
-        drawSVG: '0%',
-        duration: 1.5,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 60%',
-          end: 'bottom 40%',
-          scrub: 1,
+          gsap.from(batch, { y: 32, opacity: 0, duration: 0.7, stagger: 0.1, ease: 'power2.out' })
         },
       })
     },
@@ -130,50 +46,21 @@ export function HowItWorks() {
   )
 
   return (
-    <section id="how-it-works" ref={sectionRef} className="section-parchment relative overflow-hidden py-20 lg:py-28">
-      <svg
-        className="pointer-events-none absolute inset-x-0 top-1/2 hidden h-24 w-full -translate-y-1/2 lg:block"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <path
-          ref={lineRef}
-          d="M80 48 Q400 20 720 48 Q1040 76 1360 48"
-          fill="none"
-          stroke="#b8653a"
-          strokeWidth="2"
-          strokeDasharray="6 8"
-          opacity="0.5"
-        />
-      </svg>
-
-      <div className="relative mx-auto max-w-6xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-bold uppercase tracking-[0.3em] text-copper">Simple process</p>
-          <AnimatedText
-            as="h2"
-            className="mt-3 font-serif text-4xl font-medium tracking-tight text-ink-dark sm:text-5xl"
-          >
+    <section id="how-it-works" ref={sectionRef} className="section-studio border-b border-border py-20 lg:py-24">
+      <div className="mx-auto max-w-6xl px-6 lg:px-8">
+        <div className="max-w-lg">
+          <p className="text-sm text-ink-faint">The process</p>
+          <AnimatedText as="h2" className="mt-2 font-serif text-3xl font-medium text-ink sm:text-4xl">
             How it works
           </AnimatedText>
-          <p className="mt-4 text-lg text-ink-dark/70">
-            From your doorstep to your wall in four easy steps.
-          </p>
         </div>
 
-        <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((step) => (
-            <div key={step.number} className="step-card group relative">
-              <div className="relative rounded-2xl border border-copper/20 bg-white/60 p-6 shadow-lg shadow-copper/5 backdrop-blur-sm transition-all hover:border-gold/40 hover:shadow-xl hover:shadow-gold/10">
-                <div className="mb-4 flex items-center justify-between">
-                  <span className="font-serif text-sm font-bold text-copper">{step.number}</span>
-                  <div className="step-icon rounded-full bg-gradient-to-br from-gold/20 to-copper/10 p-2.5 text-copper transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">
-                    {step.icon}
-                  </div>
-                </div>
-                <h3 className="font-serif text-xl font-semibold text-ink-dark">{step.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink-dark/65">{step.description}</p>
-              </div>
+            <div key={step.number} className="step-card">
+              <span className="font-serif text-4xl font-light text-border-dark">{step.number}</span>
+              <h3 className="mt-3 font-serif text-lg font-medium text-ink">{step.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{step.description}</p>
             </div>
           ))}
         </div>
