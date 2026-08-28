@@ -3,6 +3,7 @@ import { ReactLenis, type LenisRef } from 'lenis/react'
 import { useRef, type ReactNode } from 'react'
 import { gsap, ScrollTrigger } from '../lib/gsap'
 import { canAnimate } from '../hooks/useGSAPAnimations'
+import { refreshScrollTriggers } from '../hooks/useScrollProgress'
 import 'lenis/dist/lenis.css'
 
 export function LenisProvider({ children }: { children: ReactNode }) {
@@ -27,6 +28,12 @@ export function LenisProvider({ children }: { children: ReactNode }) {
     return () => {
       gsap.ticker.remove(ticker)
     }
+  }, [])
+
+  useGSAP(() => {
+    const onResize = () => refreshScrollTriggers()
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
   }, [])
 
   if (!motionAllowed) {

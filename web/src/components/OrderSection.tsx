@@ -14,7 +14,7 @@ const styleLabels: Record<Style, string> = {
 }
 
 const inputClass =
-  'mt-1.5 w-full rounded-sm border border-border bg-paper px-4 py-3 text-ink outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent/30'
+  'mt-1.5 w-full rounded-sm border border-border bg-paper px-4 py-3 text-ink outline-none transition-colors ink-focus'
 
 export function OrderSection() {
   const [submitted, setSubmitted] = useState(false)
@@ -139,7 +139,7 @@ export function OrderSection() {
                       required={field.required}
                       value={form[field.key]}
                       onChange={(e) => setForm({ ...form, [field.key]: e.target.value })}
-                      className={inputClass}
+                      className="mt-1.5 w-full rounded-sm border border-border bg-paper px-4 py-3 text-ink outline-none transition-colors ink-focus"
                       placeholder={field.placeholder}
                     />
                   </div>
@@ -152,7 +152,7 @@ export function OrderSection() {
                     id="style"
                     value={form.style}
                     onChange={(e) => setForm({ ...form, style: e.target.value as Style })}
-                    className={inputClass}
+                    className="mt-1.5 w-full rounded-sm border border-border bg-paper px-4 py-3 text-ink outline-none transition-colors ink-focus"
                   >
                     {(Object.keys(styleLabels) as Style[]).map((key) => (
                       <option key={key} value={key}>
@@ -170,7 +170,7 @@ export function OrderSection() {
                     type="text"
                     value={form.address}
                     onChange={(e) => setForm({ ...form, address: e.target.value })}
-                    className={inputClass}
+                    className="mt-1.5 w-full rounded-sm border border-border bg-paper px-4 py-3 text-ink outline-none transition-colors ink-focus"
                     placeholder="123 Oak Street, Austin, TX"
                   />
                 </div>

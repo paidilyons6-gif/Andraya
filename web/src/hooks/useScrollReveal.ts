@@ -32,43 +32,6 @@ export function useScrollReveal(
   )
 }
 
-export function useTiltCard(cardRef: React.RefObject<HTMLElement | null>) {
-  const motionEnabled = useMotionEnabled()
-
-  useGSAP(
-    () => {
-      const card = cardRef.current
-      if (!card || !motionEnabled) return
-      if (window.matchMedia('(pointer: coarse)').matches) return
-
-      const rotateX = gsap.quickTo(card, 'rotateX', { duration: 0.4, ease: 'power2.out' })
-      const rotateY = gsap.quickTo(card, 'rotateY', { duration: 0.4, ease: 'power2.out' })
-
-      const onMove = (e: MouseEvent) => {
-        const rect = card.getBoundingClientRect()
-        const x = (e.clientX - rect.left) / rect.width - 0.5
-        const y = (e.clientY - rect.top) / rect.height - 0.5
-        rotateY(x * 12)
-        rotateX(-y * 12)
-      }
-
-      const onLeave = () => {
-        rotateX(0)
-        rotateY(0)
-      }
-
-      card.addEventListener('mousemove', onMove)
-      card.addEventListener('mouseleave', onLeave)
-
-      return () => {
-        card.removeEventListener('mousemove', onMove)
-        card.removeEventListener('mouseleave', onLeave)
-      }
-    },
-    { scope: cardRef, dependencies: [motionEnabled] },
-  )
-}
-
 export function useCountUp(
   ref: React.RefObject<HTMLElement | null>,
   end: number,

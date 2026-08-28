@@ -4,7 +4,7 @@
   --font-serif: "Cormorant Garamond", Georgia, serif;
   --font-sans: "DM Sans", system-ui, sans-serif;
 
-  /* Studio palette — paper, ink, one accent */
+  /* Studio palette */
   --color-paper: #f7f3ed;
   --color-paper-warm: #efe9df;
   --color-paper-deep: #e5ddd2;
@@ -19,24 +19,17 @@
   --color-border: #ddd5ca;
   --color-border-dark: #c9bfb2;
 
-  /* Legacy aliases used in components — map to authentic tokens */
-  --color-cream: #f7f3ed;
-  --color-cream-dark: #efe9df;
-  --color-parchment: #2c2825;
-  --color-parchment-muted: #6b6560;
-  --color-parchment-dark: #2c2825;
-  --color-ink-dark: #2c2825;
-  --color-midnight: #2c2825;
-  --color-dusk: #3d3834;
-  --color-dusk-light: #4a4540;
-  --color-gold: #9c4a32;
-  --color-gold-bright: #9c4a32;
-  --color-copper: #9c4a32;
-  --color-copper-deep: #7d3a28;
-  --color-blush: #d4c4b8;
-  --color-accent-light: #f0e4dc;
-  --color-accent-hover: #7d3a28;
-  --color-border-strong: #c9bfb2;
+  /* Hybrid gallery moment */
+  --color-gallery-bg: #1a1816;
+  --color-gallery-wall: #242120;
+  --color-gallery-spot: #f5efe6;
+  --color-gallery-muted: #9c9690;
+
+  /* Motion tokens */
+  --motion-draw: 1.4s;
+  --motion-chapter: 100vh;
+  --ease-draw: cubic-bezier(0.45, 0, 0.15, 1);
+  --ease-reveal: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @layer base {
@@ -75,10 +68,9 @@
   }
 
   .section-studio {
-    background-color: #ebe6dc;
+    background-color: var(--color-studio);
   }
 
-  /* Mat board — like a real framed print */
   .mat-board {
     background: #faf8f4;
     box-shadow:
@@ -89,6 +81,20 @@
   .tape-corner {
     background: rgba(232, 220, 200, 0.85);
     box-shadow: 0 1px 2px rgba(44, 40, 37, 0.1);
+  }
+
+  .gallery-wall {
+    background-color: var(--color-gallery-bg);
+  }
+
+  .process-chapter-num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ink-focus:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 1px rgba(156, 74, 50, 0.25);
   }
 }
 

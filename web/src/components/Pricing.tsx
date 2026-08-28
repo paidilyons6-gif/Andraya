@@ -1,7 +1,9 @@
+import { useGSAP } from '@gsap/react'
 import { useRef, useState } from 'react'
 import { AnimatedText } from './AnimatedText'
-import { DrawOnSvg } from './DrawOnSvg'
 import { HouseColorDrawing, HouseLineDrawing, HouseShadedDrawing } from './HouseDrawings'
+import { gsap } from '../lib/gsap'
+import { useMotionEnabled } from '../hooks/useMotionEnabled'
 
 type Tier = 'line' | 'shaded' | 'color'
 
@@ -21,6 +23,7 @@ const tiers = [
       '7–10 day delivery',
     ],
     popular: false,
+    colClass: 'lg:col-span-4 lg:col-start-1 lg:row-start-1',
     Drawing: HouseLineDrawing,
   },
   {
@@ -38,6 +41,7 @@ const tiers = [
       'Priority 5–7 day delivery',
     ],
     popular: true,
+    colClass: 'lg:col-span-5 lg:col-start-5 lg:row-start-1 lg:-mt-4',
     Drawing: HouseShadedDrawing,
   },
   {
@@ -56,6 +60,7 @@ const tiers = [
     ],
     popular: false,
     optional: true,
+    colClass: 'lg:col-span-3 lg:col-start-10 lg:row-start-1',
     Drawing: HouseColorDrawing,
   },
 ]
@@ -67,6 +72,38 @@ const sizes = [
   { label: '18×24"', addon: 85 },
 ]
 
+function LayeredPreview({ tier }: { tier: Tier }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const motionEnabled = useMotionEnabled()
+
+  useGSAP(
+    () => {
+      if (!motionEnabled || !ref.current) return
+      const layers = ref.current.querySelectorAll<HTMLElement>('[data-tier-layer]')
+      gsap.to(layers, {
+        opacity: (_i, el) => (el.getAttribute('data-tier-layer') === tier ? 1 : 0),
+        duration: 0.5,
+        ease: 'power2.inOut',
+      })
+    },
+    { scope: ref, dependencies: [tier, motionEnabled] },
+  )
+
+  return (
+    <div ref={ref} className="relative aspect-[4/3] border border-border bg-paper">
+      <div data-tier-layer="line" className="absolute inset-0 p-3" style={{ opacity: tier === 'line' ? 1 : 0 }}>
+        <HouseLineDrawing className="h-full w-full" />
+      </div>
+      <div data-tier-layer="shaded" className="absolute inset-0 p-3" style={{ opacity: tier === 'shaded' ? 1 : 0 }}>
+        <HouseShadedDrawing className="h-full w-full" />
+      </div>
+      <div data-tier-layer="color" className="absolute inset-0 p-3" style={{ opacity: tier === 'color' ? 1 : 0 }}>
+        <HouseColorDrawing className="h-full w-full" />
+      </div>
+    </div>
+  )
+}
+
 function PricingCard({
   tier,
   isSelected,
@@ -76,19 +113,15 @@ function PricingCard({
   isSelected: boolean
   onSelect: () => void
 }) {
-  const cardRef = useRef<HTMLButtonElement>(null)
-  const Drawing = tier.Drawing
-
   return (
     <button
-      ref={cardRef}
       type="button"
       onClick={onSelect}
-      className={`relative flex flex-col rounded-sm border p-6 text-left transition-all ${
+      className={`relative flex flex-col rounded-sm border p-6 text-left transition-all ${tier.colClass} ${
         isSelected
           ? 'border-accent bg-paper shadow-md'
           : 'border-border bg-paper-warm hover:border-border-dark hover:shadow-sm'
-      }`}
+      } ${tier.popular ? 'lg:scale-[1.02]' : ''}`}
     >
       {tier.popular && (
         <span className="absolute -top-3 left-6 rounded-sm bg-accent px-3 py-1 text-xs font-medium text-paper">
@@ -101,14 +134,10 @@ function PricingCard({
         </span>
       )}
 
-      <div className="mb-4 overflow-hidden border border-border bg-paper p-3">
-        {isSelected ? (
-          <DrawOnSvg key={tier.id} trigger="load" stagger={0.05} duration={0.8}>
-            <Drawing className="w-full" />
-          </DrawOnSvg>
-        ) : (
-          <Drawing className="w-full" />
-        )}
+      <div className="mb-4 overflow-hidden lg:hidden">
+        <div className="aspect-[4/3] border border-border bg-paper p-3">
+          <tier.Drawing className="h-full w-full" />
+        </div>
       </div>
 
       <p className="text-xs uppercase tracking-wider text-ink-faint">{tier.tagline}</p>
@@ -144,25 +173,38 @@ function PricingCard({
 export function Pricing() {
   const [selected, setSelected] = useState<Tier>('shaded')
   const sectionRef = useRef<HTMLElement>(null)
+  const previewRef = useRef<HTMLDivElement>(null)
 
   return (
-    <section id="styles" ref={sectionRef} className="border-b border-border py-20 lg:py-24">
+    <section id="styles" ref={sectionRef} className="border-b border-border py-20 lg:py-28">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
-        <div className="max-w-lg">
-          <p className="text-sm text-ink-faint">Styles & pricing</p>
-          <AnimatedText
-            as="h2"
-            className="mt-2 font-serif text-3xl font-medium text-ink sm:text-4xl"
-          >
-            Choose your illustration style
-          </AnimatedText>
-          <p className="mt-4 text-base leading-relaxed text-ink-muted">
+        <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+          <div>
+            <p className="text-sm text-ink-faint">Styles & pricing</p>
+            <AnimatedText
+              as="h2"
+              className="mt-2 font-serif text-3xl font-medium text-ink sm:text-4xl lg:text-5xl"
+            >
+              Choose your illustration style
+            </AnimatedText>
+          </div>
+          <p className="max-w-md text-base leading-relaxed text-ink-muted lg:pb-2">
             Start with our signature line drawings. Add shading for depth, or upgrade to full color
             when you are ready.
           </p>
         </div>
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-3">
+        {/* Shared preview on desktop */}
+        <div ref={previewRef} className="mt-12 hidden lg:block">
+          <div className="mat-board mx-auto max-w-lg p-6">
+            <LayeredPreview tier={selected} />
+            <p className="mt-4 text-center font-serif text-sm italic text-ink-faint">
+              Style preview — {tiers.find((t) => t.id === selected)?.name}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-12">
           {tiers.map((tier) => (
             <PricingCard
               key={tier.id}
@@ -173,7 +215,7 @@ export function Pricing() {
           ))}
         </div>
 
-        <div className="mt-12 border border-border bg-paper-warm p-8">
+        <div className="mt-16 border border-border bg-paper-warm p-8">
           <h3 className="font-serif text-xl font-medium text-ink">Print sizes & add-ons</h3>
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {sizes.map((size) => (
@@ -188,11 +230,11 @@ export function Pricing() {
               </div>
             ))}
           </div>
-          <div className="mt-6 flex flex-wrap gap-3 text-sm text-ink-muted">
-            <span className="border border-border bg-paper px-4 py-2">Extra print copy +$35</span>
-            <span className="border border-border bg-paper px-4 py-2">Rush delivery (3 days) +$50</span>
-            <span className="border border-border bg-paper px-4 py-2">Gift note included free</span>
-          </div>
+          <ul className="mt-6 space-y-2 text-sm text-ink-muted">
+            <li>Extra print copy — +$35</li>
+            <li>Rush delivery (3 days) — +$50</li>
+            <li>Gift note included free</li>
+          </ul>
         </div>
       </div>
     </section>

@@ -48,5 +48,3 @@ export function Footer() {
     </footer>
   )
 }
-
-export { Testimonials } from './Testimonials'

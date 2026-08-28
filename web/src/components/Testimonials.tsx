@@ -61,11 +61,12 @@ export function Testimonials() {
             What our clients say
           </AnimatedText>
         </div>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {quotes.map((quote) => (
+        <div className="mt-12 grid gap-8 md:grid-cols-3">
+          {quotes.map((quote, i) => (
             <blockquote
               key={quote.author}
               className="testimonial-card border border-border bg-paper-warm p-8"
+              style={i === 1 ? { transform: 'translateY(1rem)' } : undefined}
             >
               <p className="font-serif text-lg italic leading-relaxed text-ink">
                 "{quote.text}"
