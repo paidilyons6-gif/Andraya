@@ -30,6 +30,8 @@ jobs:
           cache-dependency-path: web/package-lock.json
 
       - name: Install and build
+        env:
+          GITHUB_PAGES: 'true'
         run: |
           cd web
           npm ci
