@@ -174,6 +174,7 @@ export function Pricing() {
           <p className="text-sm font-medium uppercase tracking-[0.25em] text-accent">Styles & pricing</p>
           <AnimatedText
             as="h2"
+            mode="words"
             className="mt-3 font-serif text-4xl font-medium tracking-tight text-ink sm:text-5xl"
           >
             Choose your illustration style

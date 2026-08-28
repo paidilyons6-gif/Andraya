@@ -10,6 +10,8 @@ type AnimatedTextProps = {
   mode?: 'lines' | 'words' | 'chars'
   trigger?: 'load' | 'scroll'
   delay?: number
+  /** Re-run animation when this key changes (e.g. form success state) */
+  animateKey?: string | number | boolean
 }
 
 export function AnimatedText({
@@ -19,6 +21,7 @@ export function AnimatedText({
   mode = 'lines',
   trigger = 'scroll',
   delay = 0,
+  animateKey,
 }: AnimatedTextProps) {
   const ref = useRef<HTMLElement>(null)
   const motionEnabled = useMotionEnabled()
@@ -28,7 +31,10 @@ export function AnimatedText({
       const el = ref.current
       if (!el || !motionEnabled) return
 
+      let revertSplit: (() => void) | undefined
+
       const run = () => {
+        revertSplit?.()
         const split = SplitText.create(el, {
           type: mode,
           mask: mode === 'lines' ? 'lines' : undefined,
@@ -64,17 +70,18 @@ export function AnimatedText({
         }
 
         gsap.from(targets, tweenVars)
-
-        return () => split.revert()
+        revertSplit = () => split.revert()
       }
 
       if (document.fonts?.ready) {
         document.fonts.ready.then(run)
       } else {
-        return run()
+        run()
       }
+
+      return () => revertSplit?.()
     },
-    { scope: ref, dependencies: [motionEnabled, children, mode, trigger, delay] },
+    { scope: ref, dependencies: [motionEnabled, children, mode, trigger, delay, animateKey] },
   )
 
   return (

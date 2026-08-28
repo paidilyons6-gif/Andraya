@@ -1,6 +1,9 @@
+import { useGSAP } from '@gsap/react'
 import { useRef, useState } from 'react'
 import { AnimatedText } from './AnimatedText'
+import { gsap } from '../lib/gsap'
 import { useScrollReveal } from '../hooks/useScrollReveal'
+import { useMotionEnabled } from '../hooks/useMotionEnabled'
 
 type Style = 'line' | 'shaded' | 'color'
 
@@ -13,7 +16,10 @@ const styleLabels: Record<Style, string> = {
 export function OrderSection() {
   const [submitted, setSubmitted] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
+  const motionEnabled = useMotionEnabled()
   useScrollReveal(sectionRef, '.order-reveal')
+
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -21,6 +27,26 @@ export function OrderSection() {
     address: '',
     notes: '',
   })
+
+  useGSAP(
+    () => {
+      if (!motionEnabled || !formRef.current || submitted) return
+
+      gsap.from(formRef.current.querySelectorAll('.order-field'), {
+        y: 28,
+        opacity: 0,
+        duration: 0.7,
+        stagger: 0.08,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: formRef.current,
+          start: 'top 85%',
+          once: true,
+        },
+      })
+    },
+    { scope: formRef, dependencies: [motionEnabled, submitted] },
+  )
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -105,7 +131,15 @@ export function OrderSection() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="font-serif text-2xl font-semibold text-ink">Request received!</h3>
+                <AnimatedText
+                  as="h3"
+                  mode="chars"
+                  trigger="load"
+                  animateKey={submitted}
+                  className="font-serif text-2xl font-semibold text-ink"
+                >
+                  Request received!
+                </AnimatedText>
                 <p className="mt-2 max-w-sm text-ink-muted">
                   Thank you, {form.name.split(' ')[0] || 'friend'}. We will email you within 24 hours
                   with upload instructions and payment details.
@@ -119,8 +153,8 @@ export function OrderSection() {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div>
+              <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+                <div className="order-field">
                   <label htmlFor="name" className="block text-sm font-medium text-ink">
                     Your name
                   </label>
@@ -134,7 +168,7 @@ export function OrderSection() {
                     placeholder="Jane Smith"
                   />
                 </div>
-                <div>
+                <div className="order-field">
                   <label htmlFor="email" className="block text-sm font-medium text-ink">
                     Email address
                   </label>
@@ -148,7 +182,7 @@ export function OrderSection() {
                     placeholder="jane@example.com"
                   />
                 </div>
-                <div>
+                <div className="order-field">
                   <label htmlFor="style" className="block text-sm font-medium text-ink">
                     Illustration style
                   </label>
@@ -165,7 +199,7 @@ export function OrderSection() {
                     ))}
                   </select>
                 </div>
-                <div>
+                <div className="order-field">
                   <label htmlFor="address" className="block text-sm font-medium text-ink">
                     Home address <span className="font-normal text-ink-faint">(for our reference)</span>
                   </label>
@@ -178,7 +212,7 @@ export function OrderSection() {
                     placeholder="123 Oak Street, Austin, TX"
                   />
                 </div>
-                <div>
+                <div className="order-field">
                   <label htmlFor="notes" className="block text-sm font-medium text-ink">
                     Special requests
                   </label>
@@ -192,7 +226,7 @@ export function OrderSection() {
                   />
                 </div>
 
-                <div className="rounded-lg border border-dashed border-border bg-cream-dark/30 p-6 text-center">
+                <div className="order-field rounded-lg border border-dashed border-border bg-cream-dark/30 p-6 text-center">
                   <svg
                     className="mx-auto h-8 w-8 text-ink-faint"
                     fill="none"
@@ -214,7 +248,7 @@ export function OrderSection() {
 
                 <button
                   type="submit"
-                  className="w-full rounded-full bg-ink py-4 text-sm font-semibold text-cream transition-colors hover:bg-ink/90"
+                  className="order-field w-full rounded-full bg-ink py-4 text-sm font-semibold text-cream transition-colors hover:bg-ink/90"
                 >
                   Request Commission — No payment yet
                 </button>

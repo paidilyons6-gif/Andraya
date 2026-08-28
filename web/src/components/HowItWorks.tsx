@@ -1,8 +1,7 @@
 import { useGSAP } from '@gsap/react'
 import { useRef } from 'react'
 import { AnimatedText } from './AnimatedText'
-import { gsap } from '../lib/gsap'
-import { useScrollReveal } from '../hooks/useScrollReveal'
+import { gsap, ScrollTrigger } from '../lib/gsap'
 import { useMotionEnabled } from '../hooks/useMotionEnabled'
 
 const steps = [
@@ -74,11 +73,41 @@ const steps = [
 
 export function HowItWorks() {
   const sectionRef = useRef<HTMLElement>(null)
-  const gridRef = useRef<HTMLDivElement>(null)
   const lineRef = useRef<SVGPathElement>(null)
   const motionEnabled = useMotionEnabled()
 
-  useScrollReveal(gridRef, '.step-card')
+  useGSAP(
+    () => {
+      if (!motionEnabled) return
+
+      ScrollTrigger.batch('.step-card', {
+        start: 'top 85%',
+        once: true,
+        onEnter: (batch) => {
+          gsap.from(batch, {
+            y: 56,
+            opacity: 0,
+            duration: 0.85,
+            stagger: 0.12,
+            ease: 'back.out(1.2)',
+          })
+          batch.forEach((el) => {
+            const icon = el.querySelector('.step-icon')
+            if (icon) {
+              gsap.from(icon, {
+                rotation: -20,
+                scale: 0.6,
+                duration: 0.6,
+                ease: 'back.out(2)',
+                delay: 0.1,
+              })
+            }
+          })
+        },
+      })
+    },
+    { scope: sectionRef, dependencies: [motionEnabled] },
+  )
 
   useGSAP(
     () => {
@@ -132,13 +161,13 @@ export function HowItWorks() {
           </p>
         </div>
 
-        <div ref={gridRef} className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((step) => (
             <div key={step.number} className="step-card group relative">
               <div className="relative rounded-2xl border border-border bg-cream p-6 transition-shadow hover:shadow-lg hover:shadow-ink/5">
                 <div className="mb-4 flex items-center justify-between">
                   <span className="font-serif text-sm font-medium text-accent">{step.number}</span>
-                  <div className="rounded-full bg-cream-dark p-2.5 text-ink-muted transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">
+                  <div className="step-icon rounded-full bg-cream-dark p-2.5 text-ink-muted transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">
                     {step.icon}
                   </div>
                 </div>

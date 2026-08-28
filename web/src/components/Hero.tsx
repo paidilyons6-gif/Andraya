@@ -70,15 +70,20 @@ export function Hero() {
           <p className="hero-fade mb-4 text-sm font-medium uppercase tracking-[0.25em] text-accent">
             Hand-drawn home portraits
           </p>
-          <AnimatedText
-            as="h1"
-            mode="lines"
-            trigger="load"
-            delay={0.2}
-            className="font-serif text-5xl font-medium leading-[1.1] tracking-tight text-ink sm:text-6xl lg:text-[4.25rem]"
-          >
-            Your home, beautifully drawn.
-          </AnimatedText>
+          <h1 className="font-serif text-5xl font-medium leading-[1.1] tracking-tight text-ink sm:text-6xl lg:text-[4.25rem]">
+            <AnimatedText as="span" mode="lines" trigger="load" delay={0.2} className="block">
+              Your home,
+            </AnimatedText>
+            <AnimatedText
+              as="span"
+              mode="lines"
+              trigger="load"
+              delay={0.45}
+              className="block italic text-ink-muted"
+            >
+              beautifully drawn.
+            </AnimatedText>
+          </h1>
           <p className="hero-fade mt-6 max-w-lg text-lg leading-relaxed text-ink-muted">
             Send us a photo of your house and receive a custom illustration of its facade — from
             elegant line drawings to richly shaded artwork. A timeless keepsake of the place you

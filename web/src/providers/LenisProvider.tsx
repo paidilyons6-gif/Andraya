@@ -2,14 +2,15 @@ import { useGSAP } from '@gsap/react'
 import { ReactLenis, type LenisRef } from 'lenis/react'
 import { useRef, type ReactNode } from 'react'
 import { gsap, ScrollTrigger } from '../lib/gsap'
+import { canAnimate } from '../hooks/useGSAPAnimations'
 import 'lenis/dist/lenis.css'
 
 export function LenisProvider({ children }: { children: ReactNode }) {
   const lenisRef = useRef<LenisRef>(null)
+  const motionAllowed = canAnimate()
 
   useGSAP(() => {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
-    if (reduced.matches) return
+    if (!motionAllowed) return
 
     const lenis = lenisRef.current?.lenis
     if (!lenis) return
@@ -27,6 +28,10 @@ export function LenisProvider({ children }: { children: ReactNode }) {
       gsap.ticker.remove(ticker)
     }
   }, [])
+
+  if (!motionAllowed) {
+    return <>{children}</>
+  }
 
   return (
     <ReactLenis

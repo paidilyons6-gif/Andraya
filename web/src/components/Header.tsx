@@ -11,9 +11,13 @@ const links = [
   { href: '#faq', label: 'FAQ' },
 ]
 
+const sections = ['#how-it-works', '#styles', '#gallery', '#order', '#faq']
+
 export function Header() {
   const [open, setOpen] = useState(false)
+  const [active, setActive] = useState('')
   const headerRef = useRef<HTMLElement>(null)
+  const indicatorRef = useRef<HTMLSpanElement>(null)
 
   useGSAP(
     () => {
@@ -39,8 +43,46 @@ export function Header() {
           })
         },
       })
+
+      sections.forEach((id) => {
+        const el = document.querySelector(id)
+        if (!el) return
+
+        ScrollTrigger.create({
+          trigger: el,
+          start: 'top center',
+          end: 'bottom center',
+          onEnter: () => setActive(id),
+          onEnterBack: () => setActive(id),
+        })
+      })
     },
     { scope: headerRef },
+  )
+
+  useGSAP(
+    () => {
+      const indicator = indicatorRef.current
+      if (!indicator || !active) return
+
+      const link = document.querySelector(`[data-nav="${active}"]`)
+      if (!link) return
+
+      const nav = link.parentElement
+      if (!nav) return
+
+      const linkRect = link.getBoundingClientRect()
+      const navRect = nav.getBoundingClientRect()
+
+      gsap.to(indicator, {
+        x: linkRect.left - navRect.left,
+        width: linkRect.width,
+        opacity: 1,
+        duration: 0.4,
+        ease: 'power3.out',
+      })
+    },
+    { dependencies: [active] },
   )
 
   useEffect(() => {
@@ -64,12 +106,20 @@ export function Header() {
           </span>
         </a>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="relative hidden items-center gap-8 md:flex">
+          <span
+            ref={indicatorRef}
+            className="absolute -bottom-1 h-0.5 rounded-full bg-accent opacity-0"
+            aria-hidden="true"
+          />
           {links.map((link) => (
             <a
               key={link.href}
+              data-nav={link.href}
               href={link.href}
-              className="text-sm font-medium text-ink-muted transition-colors hover:text-ink"
+              className={`text-sm font-medium transition-colors ${
+                active === link.href ? 'text-ink' : 'text-ink-muted hover:text-ink'
+              }`}
             >
               {link.label}
             </a>
@@ -101,7 +151,7 @@ export function Header() {
               <a
                 key={link.href}
                 href={link.href}
-                className="text-base font-medium text-ink-muted"
+                className={`text-base font-medium ${active === link.href ? 'text-ink' : 'text-ink-muted'}`}
                 onClick={() => setOpen(false)}
               >
                 {link.label}
