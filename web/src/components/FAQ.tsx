@@ -1,4 +1,8 @@
-import { useState } from 'react'
+import { useGSAP } from '@gsap/react'
+import { useRef, useState } from 'react'
+import { AnimatedText } from './AnimatedText'
+import { gsap } from '../lib/gsap'
+import { useScrollReveal } from '../hooks/useScrollReveal'
 
 const faqs = [
   {
@@ -29,20 +33,39 @@ const faqs = [
 
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
+  const sectionRef = useRef<HTMLElement>(null)
+  const answerRefs = useRef<(HTMLDivElement | null)[]>([])
+
+  useScrollReveal(sectionRef, '.faq-item')
+
+  useGSAP(
+    () => {
+      faqs.forEach((_, i) => {
+        const el = answerRefs.current[i]
+        if (!el) return
+        if (openIndex === i) {
+          gsap.to(el, { height: 'auto', opacity: 1, duration: 0.4, ease: 'power2.out' })
+        } else {
+          gsap.to(el, { height: 0, opacity: 0, duration: 0.3, ease: 'power2.in' })
+        }
+      })
+    },
+    { dependencies: [openIndex] },
+  )
 
   return (
-    <section id="faq" className="border-t border-border bg-cream-dark/30 py-20 lg:py-28">
+    <section id="faq" ref={sectionRef} className="border-t border-border bg-cream-dark/30 py-20 lg:py-28">
       <div className="mx-auto max-w-3xl px-6 lg:px-8">
         <div className="text-center">
           <p className="text-sm font-medium uppercase tracking-[0.25em] text-accent">FAQ</p>
-          <h2 className="mt-3 font-serif text-4xl font-medium tracking-tight text-ink">
+          <AnimatedText as="h2" className="mt-3 font-serif text-4xl font-medium tracking-tight text-ink">
             Common questions
-          </h2>
+          </AnimatedText>
         </div>
 
         <div className="mt-12 divide-y divide-border rounded-2xl border border-border bg-paper">
           {faqs.map((faq, i) => (
-            <div key={faq.q}>
+            <div key={faq.q} className="faq-item">
               <button
                 type="button"
                 className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
@@ -51,7 +74,7 @@ export function FAQ() {
               >
                 <span className="font-medium text-ink">{faq.q}</span>
                 <svg
-                  className={`h-5 w-5 shrink-0 text-ink-faint transition-transform ${openIndex === i ? 'rotate-180' : ''}`}
+                  className={`h-5 w-5 shrink-0 text-ink-faint transition-transform duration-300 ${openIndex === i ? 'rotate-180' : ''}`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -59,11 +82,15 @@ export function FAQ() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-              {openIndex === i && (
-                <div className="px-6 pb-5">
-                  <p className="text-sm leading-relaxed text-ink-muted">{faq.a}</p>
-                </div>
-              )}
+              <div
+                ref={(el) => {
+                  answerRefs.current[i] = el
+                }}
+                className="overflow-hidden px-6"
+                style={{ height: i === 0 ? 'auto' : 0, opacity: i === 0 ? 1 : 0 }}
+              >
+                <p className="pb-5 text-sm leading-relaxed text-ink-muted">{faq.a}</p>
+              </div>
             </div>
           ))}
         </div>

@@ -1,5 +1,11 @@
-import { useState } from 'react'
+import { useGSAP } from '@gsap/react'
+import { useRef, useState } from 'react'
+import { AnimatedText } from './AnimatedText'
+import { DrawOnSvg } from './DrawOnSvg'
 import { HouseColorDrawing, HouseLineDrawing, HouseShadedDrawing } from './HouseDrawings'
+import { useTiltCard } from '../hooks/useScrollReveal'
+import { useMotionEnabled } from '../hooks/useMotionEnabled'
+import { gsap } from '../lib/gsap'
 
 type Tier = 'line' | 'shaded' | 'color'
 
@@ -19,7 +25,6 @@ const tiers = [
       '7–10 day delivery',
     ],
     popular: false,
-    available: true,
     Drawing: HouseLineDrawing,
   },
   {
@@ -37,7 +42,6 @@ const tiers = [
       'Priority 5–7 day delivery',
     ],
     popular: true,
-    available: true,
     Drawing: HouseShadedDrawing,
   },
   {
@@ -55,7 +59,6 @@ const tiers = [
       'Premium gift packaging',
     ],
     popular: false,
-    available: true,
     optional: true,
     Drawing: HouseColorDrawing,
   },
@@ -68,17 +71,113 @@ const sizes = [
   { label: '18×24"', addon: 85 },
 ]
 
-export function Pricing() {
-  const [selected, setSelected] = useState<Tier>('shaded')
+function PricingCard({
+  tier,
+  isSelected,
+  onSelect,
+}: {
+  tier: (typeof tiers)[0]
+  isSelected: boolean
+  onSelect: () => void
+}) {
+  const cardRef = useRef<HTMLButtonElement>(null)
+  useTiltCard(cardRef)
+  const Drawing = tier.Drawing
 
   return (
-    <section id="styles" className="py-20 lg:py-28">
+    <button
+      ref={cardRef}
+      type="button"
+      onClick={onSelect}
+      data-magnetic
+      style={{ transformStyle: 'preserve-3d', perspective: '800px' }}
+      className={`relative flex flex-col rounded-2xl border-2 p-6 text-left transition-all will-change-transform ${
+        isSelected
+          ? 'border-accent bg-accent-light/30 shadow-xl shadow-accent/10'
+          : 'border-border bg-paper hover:border-ink-faint hover:shadow-lg'
+      }`}
+    >
+      {tier.popular && (
+        <span className="popular-badge absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-4 py-1 text-xs font-semibold uppercase tracking-wider text-white">
+          Most Popular
+        </span>
+      )}
+      {'optional' in tier && tier.optional && (
+        <span className="absolute -top-3 right-4 rounded-full border border-border bg-cream px-3 py-1 text-xs font-medium text-ink-muted">
+          Optional upgrade
+        </span>
+      )}
+
+      <div className="mb-4 overflow-hidden rounded-lg border border-border bg-white">
+        {isSelected ? (
+          <DrawOnSvg key={tier.id} trigger="load" stagger={0.05} duration={0.8}>
+            <Drawing className="w-full" />
+          </DrawOnSvg>
+        ) : (
+          <Drawing className="w-full" />
+        )}
+      </div>
+
+      <p className="text-xs font-medium uppercase tracking-wider text-accent">{tier.tagline}</p>
+      <h3 className="mt-1 font-serif text-2xl font-semibold text-ink">{tier.name}</h3>
+      <div className="mt-2 flex items-baseline gap-1">
+        <span className="font-serif text-4xl font-semibold text-ink">${tier.price}</span>
+        <span className="text-sm text-ink-faint">USD</span>
+      </div>
+      <p className="mt-3 text-sm leading-relaxed text-ink-muted">{tier.description}</p>
+
+      <ul className="mt-6 flex-1 space-y-2.5">
+        {tier.features.map((feature) => (
+          <li key={feature} className="flex items-start gap-2 text-sm text-ink-muted">
+            <svg className="mt-0.5 h-4 w-4 shrink-0 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            {feature}
+          </li>
+        ))}
+      </ul>
+
+      <span
+        className={`mt-6 block rounded-full py-3 text-center text-sm font-semibold transition-colors ${
+          isSelected ? 'bg-accent text-white' : 'bg-ink text-cream'
+        }`}
+      >
+        {isSelected ? 'Selected' : 'Select Style'}
+      </span>
+    </button>
+  )
+}
+
+export function Pricing() {
+  const [selected, setSelected] = useState<Tier>('shaded')
+  const sectionRef = useRef<HTMLElement>(null)
+  const motionEnabled = useMotionEnabled()
+
+  useGSAP(
+    () => {
+      if (!motionEnabled) return
+      gsap.to('.popular-badge', {
+        y: -4,
+        duration: 1.2,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+      })
+    },
+    { scope: sectionRef, dependencies: [motionEnabled] },
+  )
+
+  return (
+    <section id="styles" ref={sectionRef} className="py-20 lg:py-28">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-sm font-medium uppercase tracking-[0.25em] text-accent">Styles & pricing</p>
-          <h2 className="mt-3 font-serif text-4xl font-medium tracking-tight text-ink sm:text-5xl">
+          <AnimatedText
+            as="h2"
+            className="mt-3 font-serif text-4xl font-medium tracking-tight text-ink sm:text-5xl"
+          >
             Choose your illustration style
-          </h2>
+          </AnimatedText>
           <p className="mt-4 text-lg text-ink-muted text-balance">
             Start with our signature line drawings. Add shading for depth, or upgrade to full color
             when you are ready.
@@ -86,70 +185,14 @@ export function Pricing() {
         </div>
 
         <div className="mt-16 grid gap-6 lg:grid-cols-3">
-          {tiers.map((tier) => {
-            const isSelected = selected === tier.id
-            const Drawing = tier.Drawing
-
-            return (
-              <button
-                key={tier.id}
-                type="button"
-                onClick={() => setSelected(tier.id)}
-                className={`relative flex flex-col rounded-2xl border-2 p-6 text-left transition-all ${
-                  isSelected
-                    ? 'border-accent bg-accent-light/30 shadow-xl shadow-accent/10'
-                    : 'border-border bg-paper hover:border-ink-faint hover:shadow-lg'
-                }`}
-              >
-                {tier.popular && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-4 py-1 text-xs font-semibold uppercase tracking-wider text-white">
-                    Most Popular
-                  </span>
-                )}
-                {tier.optional && (
-                  <span className="absolute -top-3 right-4 rounded-full border border-border bg-cream px-3 py-1 text-xs font-medium text-ink-muted">
-                    Optional upgrade
-                  </span>
-                )}
-
-                <div className="mb-4 overflow-hidden rounded-lg border border-border bg-white">
-                  <Drawing className="w-full" />
-                </div>
-
-                <p className="text-xs font-medium uppercase tracking-wider text-accent">{tier.tagline}</p>
-                <h3 className="mt-1 font-serif text-2xl font-semibold text-ink">{tier.name}</h3>
-                <div className="mt-2 flex items-baseline gap-1">
-                  <span className="font-serif text-4xl font-semibold text-ink">${tier.price}</span>
-                  <span className="text-sm text-ink-faint">USD</span>
-                </div>
-                <p className="mt-3 text-sm leading-relaxed text-ink-muted">{tier.description}</p>
-
-                <ul className="mt-6 flex-1 space-y-2.5">
-                  {tier.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2 text-sm text-ink-muted">
-                      <svg
-                        className="mt-0.5 h-4 w-4 shrink-0 text-accent"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-
-                <span
-                  className={`mt-6 block rounded-full py-3 text-center text-sm font-semibold transition-colors ${
-                    isSelected ? 'bg-accent text-white' : 'bg-ink text-cream'
-                  }`}
-                >
-                  {isSelected ? 'Selected' : 'Select Style'}
-                </span>
-              </button>
-            )
-          })}
+          {tiers.map((tier) => (
+            <PricingCard
+              key={tier.id}
+              tier={tier}
+              isSelected={selected === tier.id}
+              onSelect={() => setSelected(tier.id)}
+            />
+          ))}
         </div>
 
         <div className="mt-12 rounded-2xl border border-border bg-cream-dark/50 p-8">

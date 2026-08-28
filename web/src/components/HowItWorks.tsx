@@ -1,3 +1,10 @@
+import { useGSAP } from '@gsap/react'
+import { useRef } from 'react'
+import { AnimatedText } from './AnimatedText'
+import { gsap } from '../lib/gsap'
+import { useScrollReveal } from '../hooks/useScrollReveal'
+import { useMotionEnabled } from '../hooks/useMotionEnabled'
+
 const steps = [
   {
     number: '01',
@@ -66,29 +73,74 @@ const steps = [
 ]
 
 export function HowItWorks() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
+  const lineRef = useRef<SVGPathElement>(null)
+  const motionEnabled = useMotionEnabled()
+
+  useScrollReveal(gridRef, '.step-card')
+
+  useGSAP(
+    () => {
+      if (!motionEnabled || !lineRef.current || !sectionRef.current) return
+      if (window.innerWidth < 1024) return
+
+      gsap.from(lineRef.current, {
+        drawSVG: '0%',
+        duration: 1.5,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top 60%',
+          end: 'bottom 40%',
+          scrub: 1,
+        },
+      })
+    },
+    { scope: sectionRef, dependencies: [motionEnabled] },
+  )
+
   return (
-    <section id="how-it-works" className="border-y border-border bg-paper py-20 lg:py-28">
-      <div className="mx-auto max-w-6xl px-6 lg:px-8">
+    <section id="how-it-works" ref={sectionRef} className="relative border-y border-border bg-paper py-20 lg:py-28">
+      <svg
+        className="pointer-events-none absolute inset-x-0 top-1/2 hidden h-24 w-full -translate-y-1/2 lg:block"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <path
+          ref={lineRef}
+          d="M80 48 Q400 20 720 48 Q1040 76 1360 48"
+          fill="none"
+          stroke="#b45309"
+          strokeWidth="2"
+          strokeDasharray="6 8"
+          opacity="0.5"
+        />
+      </svg>
+
+      <div className="relative mx-auto max-w-6xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-sm font-medium uppercase tracking-[0.25em] text-accent">Simple process</p>
-          <h2 className="mt-3 font-serif text-4xl font-medium tracking-tight text-ink sm:text-5xl">
+          <AnimatedText
+            as="h2"
+            className="mt-3 font-serif text-4xl font-medium tracking-tight text-ink sm:text-5xl"
+          >
             How it works
-          </h2>
+          </AnimatedText>
           <p className="mt-4 text-lg text-ink-muted">
             From your doorstep to your wall in four easy steps.
           </p>
         </div>
 
-        <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {steps.map((step, i) => (
-            <div key={step.number} className="group relative">
-              {i < steps.length - 1 && (
-                <div className="absolute left-1/2 top-8 hidden h-px w-full bg-border lg:block" aria-hidden="true" />
-              )}
+        <div ref={gridRef} className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {steps.map((step) => (
+            <div key={step.number} className="step-card group relative">
               <div className="relative rounded-2xl border border-border bg-cream p-6 transition-shadow hover:shadow-lg hover:shadow-ink/5">
                 <div className="mb-4 flex items-center justify-between">
                   <span className="font-serif text-sm font-medium text-accent">{step.number}</span>
-                  <div className="rounded-full bg-cream-dark p-2.5 text-ink-muted">{step.icon}</div>
+                  <div className="rounded-full bg-cream-dark p-2.5 text-ink-muted transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">
+                    {step.icon}
+                  </div>
                 </div>
                 <h3 className="font-serif text-xl font-semibold text-ink">{step.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-muted">{step.description}</p>

@@ -1,3 +1,7 @@
+import { useRef } from 'react'
+import { AnimatedText } from './AnimatedText'
+import { useScrollReveal } from '../hooks/useScrollReveal'
+
 export function Footer() {
   return (
     <footer className="border-t border-border bg-ink text-stone-400">
@@ -64,6 +68,9 @@ export function Footer() {
 }
 
 export function Testimonials() {
+  const sectionRef = useRef<HTMLElement>(null)
+  useScrollReveal(sectionRef, '.testimonial-card')
+
   const quotes = [
     {
       text: 'We gave this to my parents for their 40th anniversary in the home they raised us in. They cried.',
@@ -83,19 +90,22 @@ export function Testimonials() {
   ]
 
   return (
-    <section className="py-20 lg:py-28">
+    <section ref={sectionRef} className="py-20 lg:py-28">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="text-center">
           <p className="text-sm font-medium uppercase tracking-[0.25em] text-accent">Kind words</p>
-          <h2 className="mt-3 font-serif text-4xl font-medium tracking-tight text-ink">
+          <AnimatedText
+            as="h2"
+            className="mt-3 font-serif text-4xl font-medium tracking-tight text-ink"
+          >
             What our clients say
-          </h2>
+          </AnimatedText>
         </div>
         <div className="mt-14 grid gap-6 md:grid-cols-3">
           {quotes.map((quote) => (
             <blockquote
               key={quote.author}
-              className="rounded-2xl border border-border bg-paper p-8"
+              className="testimonial-card rounded-2xl border border-border bg-paper p-8"
             >
               <svg className="h-8 w-8 text-accent/30" fill="currentColor" viewBox="0 0 32 32">
                 <path d="M10 8c-3.3 0-6 2.7-6 6v10h10V14H8c0-1.1.9-2 2-2V8zm14 0c-3.3 0-6 2.7-6 6v10h10V14H22c0-1.1.9-2 2-2V8z" />

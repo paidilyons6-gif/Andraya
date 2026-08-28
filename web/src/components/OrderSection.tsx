@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { AnimatedText } from './AnimatedText'
+import { useScrollReveal } from '../hooks/useScrollReveal'
 
 type Style = 'line' | 'shaded' | 'color'
 
@@ -10,6 +12,8 @@ const styleLabels: Record<Style, string> = {
 
 export function OrderSection() {
   const [submitted, setSubmitted] = useState(false)
+  const sectionRef = useRef<HTMLElement>(null)
+  useScrollReveal(sectionRef, '.order-reveal')
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -24,14 +28,17 @@ export function OrderSection() {
   }
 
   return (
-    <section id="order" className="py-20 lg:py-28">
+    <section id="order" ref={sectionRef} className="py-20 lg:py-28">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-          <div>
+          <div className="order-reveal">
             <p className="text-sm font-medium uppercase tracking-[0.25em] text-accent">Get started</p>
-            <h2 className="mt-3 font-serif text-4xl font-medium tracking-tight text-ink sm:text-5xl">
+            <AnimatedText
+              as="h2"
+              className="mt-3 font-serif text-4xl font-medium tracking-tight text-ink sm:text-5xl"
+            >
               Commission your home portrait
-            </h2>
+            </AnimatedText>
             <p className="mt-4 text-lg leading-relaxed text-ink-muted">
               Fill out the form and we will send a confirmation with next steps for uploading your
               photo and completing payment. No charge until you approve the final artwork.
@@ -90,7 +97,7 @@ export function OrderSection() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border bg-paper p-8 shadow-xl shadow-ink/5">
+          <div className="order-reveal rounded-2xl border border-border bg-paper p-8 shadow-xl shadow-ink/5">
             {submitted ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent-light">
