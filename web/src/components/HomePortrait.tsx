@@ -1,5 +1,5 @@
-import { useId } from 'react'
 import type { Portrait, PortraitStyle } from '../data/portraits'
+import { portraitSrc } from '../data/portraits'
 
 type HomePortraitProps = {
   portrait: Portrait
@@ -16,70 +16,11 @@ const VARIANT_LABELS: Record<PortraitStyle, string> = {
   color: 'Full color wash',
 }
 
-/** SVG filters that turn a real home photo into pen-and-ink style previews */
-function PortraitFilters({ prefix }: { prefix: string }) {
-  return (
-    <svg className="absolute h-0 w-0" aria-hidden="true">
-      <defs>
-        {/* Pen line — high-contrast ink edges on paper */}
-        <filter id={`${prefix}-line`} colorInterpolationFilters="sRGB">
-          <feColorMatrix type="saturate" values="0" result="gray" />
-          <feConvolveMatrix
-            in="gray"
-            order="3"
-            kernelMatrix="-1 -1 -1 -1 9 -1 -1 -1 -1"
-            result="edges"
-          />
-          <feComponentTransfer in="edges" result="ink">
-            <feFuncR type="linear" slope="2.2" intercept="-0.35" />
-            <feFuncG type="linear" slope="2.2" intercept="-0.35" />
-            <feFuncB type="linear" slope="2.2" intercept="-0.35" />
-          </feComponentTransfer>
-          <feFlood floodColor="#faf8f4" result="paper" />
-          <feBlend in="paper" in2="ink" mode="multiply" />
-        </filter>
-
-        {/* Shaded — warm tonal wash + soft depth */}
-        <filter id={`${prefix}-shaded`} colorInterpolationFilters="sRGB">
-          <feColorMatrix type="saturate" values="0.15" result="desat" />
-          <feComponentTransfer in="desat" result="tone">
-            <feFuncR type="linear" slope="1.1" intercept="0.05" />
-            <feFuncG type="linear" slope="1.05" intercept="0.02" />
-            <feFuncB type="linear" slope="0.95" intercept="0.08" />
-          </feComponentTransfer>
-          <feConvolveMatrix
-            in="tone"
-            order="3"
-            kernelMatrix="-1 -1 -1 -1 8 -1 -1 -1 -1"
-            result="edges"
-          />
-          <feBlend in="tone" in2="edges" mode="multiply" result="mixed" />
-          <feColorMatrix
-            in="mixed"
-            type="matrix"
-            values="1.05 0.05 0   0 0
-                    0.02 1    0   0 0
-                    0    0.02 0.9 0 0
-                    0    0    0   1 0"
-          />
-        </filter>
-
-        {/* Color — gentle watercolor over realistic tones */}
-        <filter id={`${prefix}-color`} colorInterpolationFilters="sRGB">
-          <feColorMatrix
-            type="matrix"
-            values="1.08 0.02 0   0 0.02
-                    0.02 1.04 0   0 0.01
-                    0    0.02 0.96 0 0
-                    0    0    0    1 0"
-            result="warm"
-          />
-          <feGaussianBlur in="warm" stdDeviation="0.4" result="soft" />
-          <feBlend in="warm" in2="soft" mode="normal" />
-        </filter>
-      </defs>
-    </svg>
-  )
+/** CSS filters that suggest pen-and-ink / shaded / watercolor styles */
+const VARIANT_FILTERS: Record<Exclude<PortraitStyle, 'photo'>, string> = {
+  line: 'grayscale(1) contrast(1.55) brightness(1.08)',
+  shaded: 'sepia(0.35) contrast(1.15) saturate(0.75) brightness(1.05)',
+  color: 'saturate(1.2) contrast(1.05) brightness(1.03) hue-rotate(-4deg)',
 }
 
 export function HomePortrait({
@@ -89,29 +30,27 @@ export function HomePortrait({
   caption,
   showCaption = false,
 }: HomePortraitProps) {
-  const uid = useId().replace(/:/g, '')
-  const filterId = variant === 'photo' ? undefined : `${uid}-${variant}`
+  const src = portraitSrc(portrait.photo)
 
   return (
     <figure className={`relative overflow-hidden bg-paper ${className}`}>
-      <PortraitFilters prefix={uid} />
       <div className="relative aspect-[4/3] w-full overflow-hidden">
         <img
-          src={portrait.photo}
+          src={src}
           alt={`${portrait.label}, ${portrait.location} — ${VARIANT_LABELS[variant]}`}
           className="h-full w-full object-cover object-center"
           style={
-            filterId
-              ? { filter: `url(#${filterId})`, transform: 'scale(1.02)' }
-              : undefined
+            variant === 'photo'
+              ? undefined
+              : { filter: VARIANT_FILTERS[variant], transform: 'scale(1.02)' }
           }
-          loading="lazy"
+          loading={variant === 'photo' ? 'eager' : 'lazy'}
           decoding="async"
         />
         {variant !== 'photo' && (
           <>
             <div
-              className="pointer-events-none absolute inset-0 opacity-[0.07] mix-blend-multiply paper-grain"
+              className="pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-multiply paper-grain"
               aria-hidden="true"
             />
             <div

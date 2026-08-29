@@ -4,65 +4,62 @@ export type Portrait = {
   id: string
   label: string
   location: string
-  /** Client reference photo — front facade */
+  /** Path under public/ — resolved with import.meta.env.BASE_URL */
   photo: string
 }
 
-/** Real home facades used across previews (Unsplash, free to hotlink) */
+/** Bundled real home facades (Unsplash, stored in public/portraits/) */
 export const PORTRAITS: Record<string, Portrait> = {
   craftsmanPortland: {
     id: 'craftsman-portland',
     label: 'Craftsman bungalow',
     location: 'Portland, OR',
-    photo:
-      'https://images.unsplash.com/photo-1568605114967-8130f3a36993?auto=format&fit=crop&w=900&q=80',
+    photo: 'portraits/craftsman-portland.jpg',
   },
   victorianPortland: {
     id: 'victorian-portland',
     label: 'Victorian revival',
     location: 'Portland, OR',
-    photo:
-      'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=900&q=80',
+    photo: 'portraits/victorian-portland.jpg',
   },
   cottageAsheville: {
     id: 'cottage-asheville',
     label: 'Country cottage',
     location: 'Asheville, NC',
-    photo:
-      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=900&q=80',
+    photo: 'portraits/cottage-asheville.jpg',
   },
   modernPalmSprings: {
     id: 'modern-palm-springs',
     label: 'Mid-century modern',
     location: 'Palm Springs, CA',
-    photo:
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=900&q=80',
+    photo: 'portraits/modern-palm-springs.jpg',
   },
   craftsmanSeattle: {
     id: 'craftsman-seattle',
     label: 'Craftsman bungalow',
     location: 'Seattle, WA',
-    photo:
-      'https://images.unsplash.com/photo-1598228723793-89fd745e1731?auto=format&fit=crop&w=900&q=80',
+    photo: 'portraits/craftsman-seattle.jpg',
   },
   colonialCharleston: {
     id: 'colonial-charleston',
     label: 'Colonial estate',
     location: 'Charleston, SC',
-    photo:
-      'https://images.unsplash.com/photo-1605276374101-dee2a0ed3cd6?auto=format&fit=crop&w=900&q=80',
+    photo: 'portraits/colonial-charleston.jpg',
   },
   brownstoneBrooklyn: {
     id: 'brownstone-brooklyn',
     label: 'Urban brownstone',
     location: 'Brooklyn, NY',
-    photo:
-      'https://images.unsplash.com/photo-1460317442991-0ec209397118?auto=format&fit=crop&w=900&q=80',
+    photo: 'portraits/brownstone-brooklyn.jpg',
   },
 }
 
-/** Default hero + pricing preview home */
 export const HERO_PORTRAIT = PORTRAITS.craftsmanPortland
+
+export function portraitSrc(path: string): string {
+  const base = import.meta.env.BASE_URL
+  return `${base}${path.replace(/^\//, '')}`
+}
 
 export const GALLERY_PORTRAITS = [
   {
