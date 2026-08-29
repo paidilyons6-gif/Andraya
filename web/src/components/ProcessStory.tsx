@@ -1,6 +1,7 @@
 import { useGSAP } from '@gsap/react'
 import { useRef } from 'react'
-import { HouseLineDrawing, HouseShadedDrawing } from './HouseDrawings'
+import { HomePortrait } from './HomePortrait'
+import { HERO_PORTRAIT } from '../data/portraits'
 import { gsap, ScrollTrigger } from '../lib/gsap'
 import { MOTION } from '../lib/motion'
 import { useMotionEnabled } from '../hooks/useMotionEnabled'
@@ -41,7 +42,6 @@ export function ProcessStory() {
 
       mm.add('(min-width: 1024px)', () => {
         const pin = pinRef.current!
-        const drawPaths = pin.querySelectorAll<SVGGeometryElement>('.process-line-layer [data-draw]')
 
         const tl = gsap.timeline({
           scrollTrigger: {
@@ -56,17 +56,13 @@ export function ProcessStory() {
 
         tl.fromTo('.process-photo', { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 1 }, 0)
           .fromTo('.process-chapter-0', { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6 }, 0)
-
-        if (drawPaths.length) {
-          tl.fromTo(
-            drawPaths,
-            { drawSVG: '0%' },
-            { drawSVG: '100%', duration: 2, stagger: MOTION.stagger.draw, ease: 'none' },
+          .fromTo(
+            '.process-line-layer',
+            { clipPath: 'inset(0 100% 0 0)', opacity: 1 },
+            { clipPath: 'inset(0 0% 0 0)', duration: 2, ease: 'none' },
             1,
           )
-        }
-
-        tl.fromTo('.process-chapter-0', { opacity: 1 }, { opacity: 0, y: -16, duration: 0.4 }, 2)
+          .fromTo('.process-chapter-0', { opacity: 1 }, { opacity: 0, y: -16, duration: 0.4 }, 2)
           .fromTo('.process-chapter-1', { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6 }, 2.1)
           .fromTo('.process-line-layer', { opacity: 1 }, { opacity: 0, duration: 0.8 }, 3)
           .fromTo('.process-shade-layer', { opacity: 0 }, { opacity: 1, duration: 0.8 }, 3)
@@ -97,37 +93,30 @@ export function ProcessStory() {
 
   return (
     <section id="how-it-works" ref={sectionRef} className="relative">
-      {/* Desktop pinned narrative */}
       <div ref={pinRef} className="hidden min-h-screen lg:block">
         <div className="section-studio flex min-h-screen items-center border-b border-border">
           <div className="mx-auto grid w-full max-w-6xl grid-cols-[1fr_1.1fr] items-center gap-16 px-8 py-16">
             <div className="relative h-[420px]">
               <div className="process-photo absolute inset-0 flex items-center justify-center opacity-0">
                 <div className="w-full max-w-sm border border-border-dark bg-paper p-3 shadow-sm">
-                  <div
-                    className="aspect-[4/3] bg-cover bg-center"
-                    style={{
-                      backgroundImage:
-                        'linear-gradient(135deg, #d4cfc7 0%, #a8a29e 40%, #78716c 100%)',
-                    }}
-                  />
+                  <HomePortrait portrait={HERO_PORTRAIT} variant="photo" />
                   <p className="mt-2 text-center font-serif text-xs italic text-ink-faint">
-                    Reference photo — your submission
+                    Your photo — we draw from this
                   </p>
                 </div>
               </div>
 
               <div className="process-line-layer absolute inset-0 flex items-center justify-center">
-                <HouseLineDrawing className="w-full max-w-sm" />
+                <HomePortrait portrait={HERO_PORTRAIT} variant="line" className="w-full max-w-sm" />
               </div>
 
               <div className="process-shade-layer absolute inset-0 flex items-center justify-center opacity-0">
-                <HouseShadedDrawing className="w-full max-w-sm" />
+                <HomePortrait portrait={HERO_PORTRAIT} variant="shaded" className="w-full max-w-sm" />
               </div>
 
               <div className="process-mat absolute inset-0 flex items-center justify-center opacity-0">
                 <div className="mat-board w-full max-w-sm p-5">
-                  <HouseShadedDrawing className="w-full" />
+                  <HomePortrait portrait={HERO_PORTRAIT} variant="shaded" />
                   <p className="mt-3 text-center font-serif text-sm italic text-ink-faint">
                     Ready to frame — archival print included
                   </p>
@@ -153,7 +142,6 @@ export function ProcessStory() {
         </div>
       </div>
 
-      {/* Mobile: editorial stack */}
       <div className="border-b border-border lg:hidden">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <p className="text-sm text-ink-faint">The process</p>
@@ -165,14 +153,19 @@ export function ProcessStory() {
               <span className="font-serif text-4xl font-light text-border-dark">{ch.num}</span>
               <h3 className="mt-3 font-serif text-xl font-medium text-ink">{ch.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-ink-muted">{ch.body}</p>
+              {i === 0 && (
+                <div className="mt-6 border border-border bg-paper p-3">
+                  <HomePortrait portrait={HERO_PORTRAIT} variant="photo" />
+                </div>
+              )}
               {i === 1 && (
-                <div className="mt-6 border border-border bg-paper p-4">
-                  <DrawOnSvgMobile />
+                <div className="mt-6 border border-border bg-paper p-3">
+                  <HomePortrait portrait={HERO_PORTRAIT} variant="line" />
                 </div>
               )}
               {i === 3 && (
                 <div className="mat-board mt-6 p-4">
-                  <HouseShadedDrawing className="w-full" />
+                  <HomePortrait portrait={HERO_PORTRAIT} variant="shaded" />
                 </div>
               )}
             </article>
@@ -180,32 +173,6 @@ export function ProcessStory() {
         </div>
       </div>
     </section>
-  )
-}
-
-function DrawOnSvgMobile() {
-  const ref = useRef<HTMLDivElement>(null)
-  const motionEnabled = useMotionEnabled()
-
-  useGSAP(
-    () => {
-      if (!motionEnabled || !ref.current) return
-      const paths = ref.current.querySelectorAll<SVGGeometryElement>('[data-draw]')
-      gsap.from(paths, {
-        drawSVG: '0%',
-        duration: 1.2,
-        stagger: 0.05,
-        ease: 'power2.inOut',
-        scrollTrigger: { trigger: ref.current, start: 'top 80%', once: true },
-      })
-    },
-    { scope: ref, dependencies: [motionEnabled] },
-  )
-
-  return (
-    <div ref={ref}>
-      <HouseLineDrawing className="w-full" />
-    </div>
   )
 }
 

@@ -1,8 +1,9 @@
 import { useGSAP } from '@gsap/react'
 import { useRef } from 'react'
 import { AnimatedText } from './AnimatedText'
-import { DrawOnSvg } from './DrawOnSvg'
-import { HouseLineDrawing } from './HouseDrawings'
+import { DrawingReveal } from './DrawingReveal'
+import { HomePortrait } from './HomePortrait'
+import { HERO_PORTRAIT } from '../data/portraits'
 import { MagneticButton } from './MagneticButton'
 import { gsap } from '../lib/gsap'
 import { useDrawHandoff } from '../context/DrawHandoffContext'
@@ -68,8 +69,8 @@ export function Hero() {
             </AnimatedText>
           </h1>
           <p className="hero-fade mt-6 max-w-[36ch] text-base leading-relaxed text-ink-muted">
-            We draw the front of your house by hand — pen and ink, from your photo. A keepsake
-            worth framing, made by real artists in our studio.
+            Send us a photo of your house — we draw the front facade by hand, pen and ink. A keepsake
+            portrait of the home you love, ready to frame.
           </p>
           <div className="hero-fade mt-8 flex flex-wrap items-center gap-5">
             <MagneticButton
@@ -97,14 +98,14 @@ export function Hero() {
               <div className="tape-corner absolute -left-2 top-8 h-8 w-5 -rotate-45" aria-hidden="true" />
               <div className="tape-corner absolute -right-2 top-12 h-8 w-5 rotate-45" aria-hidden="true" />
               {preloaderComplete ? (
-                <HouseLineDrawing className="w-full" />
+                <HomePortrait portrait={HERO_PORTRAIT} variant="line" />
               ) : (
-                <DrawOnSvg trigger="load" stagger={0.06} duration={1} delay={0.4}>
-                  <HouseLineDrawing className="w-full" />
-                </DrawOnSvg>
+                <DrawingReveal trigger="load" delay={0.35} duration={1.6}>
+                  <HomePortrait portrait={HERO_PORTRAIT} variant="line" />
+                </DrawingReveal>
               )}
               <p className="mt-4 text-center font-serif text-sm italic text-ink-faint">
-                Fig. 1 — Classic line, Portland OR
+                Fig. 1 — {HERO_PORTRAIT.label}, {HERO_PORTRAIT.location}
               </p>
             </div>
             <p className="mt-3 text-center text-xs text-ink-faint">From $89 · includes archival print</p>

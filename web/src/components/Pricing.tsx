@@ -1,7 +1,9 @@
 import { useGSAP } from '@gsap/react'
 import { useRef, useState } from 'react'
 import { AnimatedText } from './AnimatedText'
-import { HouseColorDrawing, HouseLineDrawing, HouseShadedDrawing } from './HouseDrawings'
+import { HomePortrait } from './HomePortrait'
+import { HERO_PORTRAIT } from '../data/portraits'
+import type { PortraitStyle } from '../data/portraits'
 import { gsap } from '../lib/gsap'
 import { useMotionEnabled } from '../hooks/useMotionEnabled'
 
@@ -14,7 +16,7 @@ const tiers = [
     tagline: 'Clean & timeless',
     price: 89,
     description:
-      'Precise pen-and-ink line work capturing every architectural detail. Minimal, elegant, and perfect for modern interiors.',
+      'Precise pen-and-ink line work capturing every architectural detail — windows, siding, roofline, and landscaping.',
     features: [
       'Front facade illustration',
       'Fine ink line work',
@@ -24,7 +26,7 @@ const tiers = [
     ],
     popular: false,
     colClass: 'lg:col-span-4 lg:col-start-1 lg:row-start-1',
-    Drawing: HouseLineDrawing,
+    variant: 'line' as PortraitStyle,
   },
   {
     id: 'shaded' as Tier,
@@ -42,7 +44,7 @@ const tiers = [
     ],
     popular: true,
     colClass: 'lg:col-span-5 lg:col-start-5 lg:row-start-1 lg:-mt-4',
-    Drawing: HouseShadedDrawing,
+    variant: 'shaded' as PortraitStyle,
   },
   {
     id: 'color' as Tier,
@@ -61,7 +63,7 @@ const tiers = [
     popular: false,
     optional: true,
     colClass: 'lg:col-span-3 lg:col-start-10 lg:row-start-1',
-    Drawing: HouseColorDrawing,
+    variant: 'color' as PortraitStyle,
   },
 ]
 
@@ -90,16 +92,17 @@ function LayeredPreview({ tier }: { tier: Tier }) {
   )
 
   return (
-    <div ref={ref} className="relative aspect-[4/3] border border-border bg-paper">
-      <div data-tier-layer="line" className="absolute inset-0 p-3" style={{ opacity: tier === 'line' ? 1 : 0 }}>
-        <HouseLineDrawing className="h-full w-full" />
-      </div>
-      <div data-tier-layer="shaded" className="absolute inset-0 p-3" style={{ opacity: tier === 'shaded' ? 1 : 0 }}>
-        <HouseShadedDrawing className="h-full w-full" />
-      </div>
-      <div data-tier-layer="color" className="absolute inset-0 p-3" style={{ opacity: tier === 'color' ? 1 : 0 }}>
-        <HouseColorDrawing className="h-full w-full" />
-      </div>
+    <div ref={ref} className="relative aspect-[4/3] overflow-hidden border border-border bg-paper">
+      {(['line', 'shaded', 'color'] as Tier[]).map((t) => (
+        <div
+          key={t}
+          data-tier-layer={t}
+          className="absolute inset-0"
+          style={{ opacity: tier === t ? 1 : 0 }}
+        >
+          <HomePortrait portrait={HERO_PORTRAIT} variant={t} />
+        </div>
+      ))}
     </div>
   )
 }
@@ -135,9 +138,7 @@ function PricingCard({
       )}
 
       <div className="mb-4 overflow-hidden lg:hidden">
-        <div className="aspect-[4/3] border border-border bg-paper p-3">
-          <tier.Drawing className="h-full w-full" />
-        </div>
+        <HomePortrait portrait={HERO_PORTRAIT} variant={tier.variant} />
       </div>
 
       <p className="text-xs uppercase tracking-wider text-ink-faint">{tier.tagline}</p>
@@ -173,7 +174,6 @@ function PricingCard({
 export function Pricing() {
   const [selected, setSelected] = useState<Tier>('shaded')
   const sectionRef = useRef<HTMLElement>(null)
-  const previewRef = useRef<HTMLDivElement>(null)
 
   return (
     <section id="styles" ref={sectionRef} className="border-b border-border py-20 lg:py-28">
@@ -189,17 +189,17 @@ export function Pricing() {
             </AnimatedText>
           </div>
           <p className="max-w-md text-base leading-relaxed text-ink-muted lg:pb-2">
-            Start with our signature line drawings. Add shading for depth, or upgrade to full color
-            when you are ready.
+            Same home, three ways — from precise ink lines to full watercolor. Every style is drawn
+            from your photo by hand.
           </p>
         </div>
 
-        {/* Shared preview on desktop */}
-        <div ref={previewRef} className="mt-12 hidden lg:block">
+        <div className="mt-12 hidden lg:block">
           <div className="mat-board mx-auto max-w-lg p-6">
             <LayeredPreview tier={selected} />
             <p className="mt-4 text-center font-serif text-sm italic text-ink-faint">
-              Style preview — {tiers.find((t) => t.id === selected)?.name}
+              {HERO_PORTRAIT.label}, {HERO_PORTRAIT.location} —{' '}
+              {tiers.find((t) => t.id === selected)?.name}
             </p>
           </div>
         </div>

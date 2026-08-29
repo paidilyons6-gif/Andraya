@@ -1,8 +1,9 @@
 import { Suspense, lazy, useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react'
 import { AnimatedText } from './AnimatedText'
-import { DrawOnSvg } from './DrawOnSvg'
-import { CottageHouse, ModernHouse, VictorianHouse } from './HouseDrawings'
+import { DrawingReveal } from './DrawingReveal'
+import { HomePortrait } from './HomePortrait'
+import { GALLERY_PORTRAITS } from '../data/portraits'
 import { gsap, ScrollTrigger } from '../lib/gsap'
 import { MOTION } from '../lib/motion'
 import { refreshScrollTriggers } from '../hooks/useScrollProgress'
@@ -11,15 +12,6 @@ import { useMotionEnabled } from '../hooks/useMotionEnabled'
 const GalleryCanvas = lazy(() =>
   import('./webgl/GalleryCanvas').then((m) => ({ default: m.GalleryCanvas })),
 )
-
-const galleryItems = [
-  { title: 'Victorian Revival', style: 'Classic Line', location: 'Portland, OR', House: VictorianHouse },
-  { title: 'Country Cottage', style: 'Line + Shading', location: 'Asheville, NC', House: CottageHouse },
-  { title: 'Mid-Century Modern', style: 'Classic Line', location: 'Palm Springs, CA', House: ModernHouse },
-  { title: 'Craftsman Bungalow', style: 'Line + Shading', location: 'Seattle, WA', House: VictorianHouse },
-  { title: 'Colonial Estate', style: 'Full Color', location: 'Charleston, SC', House: CottageHouse },
-  { title: 'Urban Brownstone', style: 'Classic Line', location: 'Brooklyn, NY', House: ModernHouse },
-]
 
 export function Gallery() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -162,8 +154,7 @@ export function Gallery() {
               Recent commissions
             </AnimatedText>
             <p className="mt-4 max-w-lg text-base text-gallery-muted">
-              Scroll through work from our studio wall — each piece drawn by hand from a client&apos;s
-              photo.
+              Real homes, real clients — each portrait drawn by hand from a front-facing photo.
             </p>
           </div>
 
@@ -172,14 +163,12 @@ export function Gallery() {
               ref={trackRef}
               className="flex w-max gap-8 px-8 lg:px-[max(2rem,calc((100vw-72rem)/2+2rem))]"
             >
-              {galleryItems.map((item) => (
+              {GALLERY_PORTRAITS.map((item) => (
                 <article key={item.title} className="gallery-card w-[min(85vw,360px)] shrink-0">
                   <div className="mat-board p-4">
-                    <DrawOnSvg trigger="scroll" stagger={0.04} duration={0.6}>
-                      <div className="flex aspect-[4/3] items-center justify-center border border-border bg-paper p-6">
-                        <item.House className="h-full w-full max-h-36" />
-                      </div>
-                    </DrawOnSvg>
+                    <DrawingReveal trigger="scroll" duration={1.2}>
+                      <HomePortrait portrait={item.portrait} variant={item.styleVariant} />
+                    </DrawingReveal>
                     <div className="mt-4 border-t border-border pt-4">
                       <div className="flex items-start justify-between gap-2">
                         <h3 className="font-serif text-lg font-medium text-ink">{item.title}</h3>
@@ -187,7 +176,7 @@ export function Gallery() {
                           {item.style}
                         </span>
                       </div>
-                      <p className="mt-1 text-sm text-ink-muted">{item.location}</p>
+                      <p className="mt-1 text-sm text-ink-muted">{item.portrait.location}</p>
                     </div>
                   </div>
                 </article>
@@ -202,21 +191,19 @@ export function Gallery() {
         <p className="text-xs uppercase tracking-[0.25em] text-gallery-muted">Portfolio</p>
         <h2 className="mt-3 font-serif text-3xl font-medium text-gallery-spot">Recent commissions</h2>
         <p className="mt-4 text-sm text-gallery-muted">
-          Every home tells a story. Here are a few we have had the pleasure of drawing.
+          Real homes, real clients — each portrait drawn by hand from a front-facing photo.
         </p>
         <div className="mt-10 space-y-8">
-          {galleryItems.map((item) => (
+          {GALLERY_PORTRAITS.map((item) => (
             <article key={item.title} className="gallery-card">
               <div className="mat-board p-4">
-                <DrawOnSvg trigger="scroll" stagger={0.04} duration={0.6}>
-                  <div className="flex aspect-[4/3] items-center justify-center border border-border bg-paper p-6">
-                    <item.House className="h-full w-full max-h-32" />
-                  </div>
-                </DrawOnSvg>
+                <DrawingReveal trigger="scroll" duration={1.2}>
+                  <HomePortrait portrait={item.portrait} variant={item.styleVariant} />
+                </DrawingReveal>
                 <div className="mt-4 border-t border-border pt-3">
                   <h3 className="font-serif text-lg font-medium text-ink">{item.title}</h3>
                   <p className="mt-1 text-xs uppercase tracking-wider text-ink-faint">{item.style}</p>
-                  <p className="text-sm text-ink-muted">{item.location}</p>
+                  <p className="text-sm text-ink-muted">{item.portrait.location}</p>
                 </div>
               </div>
             </article>
