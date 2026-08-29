@@ -1,7 +1,6 @@
 import { useGSAP } from '@gsap/react'
 import { useRef } from 'react'
 import { AnimatedText } from './AnimatedText'
-import { DrawingReveal } from './DrawingReveal'
 import { HomePortrait } from './HomePortrait'
 import { HERO_PORTRAIT } from '../data/portraits'
 import { MagneticButton } from './MagneticButton'
@@ -9,10 +8,77 @@ import { gsap } from '../lib/gsap'
 import { useDrawHandoff } from '../context/DrawHandoffContext'
 import { useMotionEnabled } from '../hooks/useMotionEnabled'
 
+function HeroDust() {
+  return (
+    <svg
+      className="hero-dust pointer-events-none absolute inset-0 h-full w-full opacity-30"
+      aria-hidden="true"
+    >
+      {[
+        { cx: '18%', cy: '22%', r: 1.2 },
+        { cx: '72%', cy: '15%', r: 0.9 },
+        { cx: '85%', cy: '68%', r: 1.4 },
+        { cx: '12%', cy: '78%', r: 1 },
+        { cx: '48%', cy: '8%', r: 0.8 },
+      ].map((d, i) => (
+        <circle key={i} cx={d.cx} cy={d.cy} r={d.r} fill="#9c4a32" opacity="0.35" />
+      ))}
+    </svg>
+  )
+}
+
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null)
+  const frameRef = useRef<HTMLDivElement>(null)
+  const captionRef = useRef<HTMLParagraphElement>(null)
+  const washRef = useRef<HTMLDivElement>(null)
   const motionEnabled = useMotionEnabled()
-  const { preloaderComplete } = useDrawHandoff()
+  const { flipComplete, skippedHandoff, heroTargetRef } = useDrawHandoff()
+
+  useGSAP(
+    () => {
+      if (!motionEnabled || !frameRef.current) return
+
+      gsap.to(frameRef.current, {
+        y: -40,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 1,
+        },
+      })
+
+      if (captionRef.current) {
+        gsap.to(captionRef.current, {
+          y: -16,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 0.6,
+          },
+        })
+      }
+
+      if (washRef.current) {
+        gsap.to(washRef.current, {
+          y: 24,
+          opacity: 0.5,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 1.2,
+          },
+        })
+      }
+    },
+    { scope: sectionRef, dependencies: [motionEnabled] },
+  )
 
   useGSAP(
     () => {
@@ -23,28 +89,42 @@ export function Hero() {
         duration: 0.8,
         stagger: 0.08,
         ease: 'power2.out',
-        delay: preloaderComplete ? 0.1 : 0.5,
+        delay: flipComplete ? 0.15 : 0.5,
       })
     },
-    { scope: sectionRef, dependencies: [motionEnabled, preloaderComplete] },
+    { scope: sectionRef, dependencies: [motionEnabled, flipComplete] },
   )
 
   return (
     <section ref={sectionRef} className="relative overflow-hidden border-b border-border">
+      <div
+        ref={washRef}
+        className="pointer-events-none absolute -right-20 top-10 h-64 w-64 rounded-full opacity-60 blur-3xl"
+        style={{ background: 'radial-gradient(circle, #e8ddd4 0%, transparent 70%)' }}
+        aria-hidden="true"
+      />
+      <HeroDust />
+
       <div className="relative mx-auto grid max-w-6xl gap-12 px-6 py-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16 lg:px-8 lg:py-28">
         <div>
           <p className="hero-fade mb-3 font-serif text-sm italic text-ink-muted">
             Andraya Studio · Est. 2019
           </p>
           <h1 className="font-serif text-5xl font-medium leading-[1.06] tracking-tight text-ink sm:text-6xl lg:text-[4rem]">
-            <AnimatedText as="span" mode="lines" trigger="load" delay={preloaderComplete ? 0 : 0.15} className="block">
+            <AnimatedText
+              as="span"
+              mode="chars"
+              trigger="load"
+              delay={flipComplete ? 0.05 : 0.2}
+              className="block"
+            >
               Your home,
             </AnimatedText>
             <AnimatedText
               as="span"
-              mode="lines"
+              mode="chars"
               trigger="load"
-              delay={preloaderComplete ? 0.1 : 0.35}
+              delay={flipComplete ? 0.15 : 0.4}
               className="block italic text-ink-muted"
             >
               beautifully drawn.
@@ -75,22 +155,26 @@ export function Hero() {
         </div>
 
         <div>
-          <div className="relative mx-auto max-w-md lg:ml-auto">
-            <div className="mat-board relative p-5 sm:p-6">
-              <div className="tape-corner absolute -left-2 top-8 h-8 w-5 -rotate-45" aria-hidden="true" />
-              <div className="tape-corner absolute -right-2 top-12 h-8 w-5 rotate-45" aria-hidden="true" />
-              {preloaderComplete ? (
+          <div ref={frameRef} className="relative mx-auto max-w-md will-change-transform lg:ml-auto">
+            <div ref={heroTargetRef} className="mat-board relative min-h-[280px] p-5 sm:p-6">
+              <div
+                className="hero-tape tape-corner absolute -left-2 top-8 h-8 w-5 -rotate-45 opacity-0"
+                aria-hidden="true"
+              />
+              <div
+                className="hero-tape tape-corner absolute -right-2 top-12 h-8 w-5 rotate-45 opacity-0"
+                aria-hidden="true"
+              />
+              {(!motionEnabled || skippedHandoff) && (
                 <HomePortrait portrait={HERO_PORTRAIT} variant="line" />
-              ) : (
-                <DrawingReveal trigger="load" delay={0.35} duration={1.6}>
-                  <HomePortrait portrait={HERO_PORTRAIT} variant="line" />
-                </DrawingReveal>
               )}
-              <p className="mt-4 text-center font-serif text-sm italic text-ink-faint">
-                Fig. 1 — {HERO_PORTRAIT.label}, {HERO_PORTRAIT.location}
-              </p>
             </div>
-            <p className="mt-3 text-center text-xs text-ink-faint">From $89 · includes archival print</p>
+            <p
+              ref={captionRef}
+              className="mt-3 text-center text-xs text-ink-faint will-change-transform"
+            >
+              From $89 · includes archival print
+            </p>
           </div>
         </div>
       </div>

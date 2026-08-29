@@ -1,5 +1,6 @@
 import { lazy, Suspense, useState } from 'react'
 import { DrawHandoffProvider } from './context/DrawHandoffContext'
+import { ScrollInkLine } from './components/ScrollInkLine'
 import { StudioBackdrop } from './components/AmbientBackground'
 import { FAQ } from './components/FAQ'
 import { Footer } from './components/Footer'
@@ -29,6 +30,7 @@ function App() {
           </Suspense>
         )}
         <StudioBackdrop />
+        <ScrollInkLine />
         <div className="paper-grain pointer-events-none fixed inset-0 z-[1] opacity-[0.04]" aria-hidden="true" />
         <div className="relative z-10">
           <Header />

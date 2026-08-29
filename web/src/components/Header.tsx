@@ -1,6 +1,6 @@
 import { useGSAP } from '@gsap/react'
 import { useEffect, useRef, useState } from 'react'
-import { ScrollTrigger } from '../lib/gsap'
+import { gsap, ScrollTrigger } from '../lib/gsap'
 import { MagneticButton } from './MagneticButton'
 
 const links = [
@@ -18,6 +18,8 @@ export function Header() {
   const [active, setActive] = useState('')
   const [scrolled, setScrolled] = useState(false)
   const headerRef = useRef<HTMLElement>(null)
+  const navRef = useRef<HTMLElement>(null)
+  const lastScroll = useRef(0)
 
   useGSAP(
     () => {
@@ -38,8 +40,41 @@ export function Header() {
           onEnterBack: () => setActive(id),
         })
       })
+
+      ScrollTrigger.create({
+        start: 0,
+        end: 'max',
+        onUpdate: (self) => {
+          const header = headerRef.current
+          if (!header) return
+          const y = self.scroll()
+          if (y > lastScroll.current && y > 120) {
+            gsap.to(header, { y: '-100%', duration: 0.35, ease: 'power2.out' })
+          } else {
+            gsap.to(header, { y: 0, duration: 0.35, ease: 'power2.out' })
+          }
+          lastScroll.current = y
+        },
+      })
     },
     { scope: headerRef },
+  )
+
+  useGSAP(
+    () => {
+      if (!navRef.current) return
+      const underlines = navRef.current.querySelectorAll('.nav-link-underline')
+      underlines.forEach((el) => {
+        const link = el.parentElement?.getAttribute('href')
+        gsap.to(el, {
+          scaleX: link === active ? 1 : 0,
+          duration: 0.35,
+          ease: 'power2.out',
+          transformOrigin: 'left center',
+        })
+      })
+    },
+    { dependencies: [active] },
   )
 
   useEffect(() => {
@@ -62,16 +97,20 @@ export function Header() {
           Andraya
         </a>
 
-        <nav className="hidden items-center gap-7 md:flex">
+        <nav ref={navRef} className="hidden items-center gap-7 md:flex">
           {links.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className={`text-sm transition-colors ${
+              className={`relative text-sm transition-colors ${
                 active === link.href ? 'font-medium text-ink' : 'text-ink-muted hover:text-ink'
               }`}
             >
               {link.label}
+              <span
+                className="nav-link-underline absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-accent"
+                aria-hidden="true"
+              />
             </a>
           ))}
           <MagneticButton

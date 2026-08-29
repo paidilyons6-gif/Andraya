@@ -1,19 +1,30 @@
 import { useGSAP } from '@gsap/react'
 import { useRef, useState } from 'react'
-import { gsap, DrawSVGPlugin } from '../lib/gsap'
-import { HOUSE_PATH } from '../lib/motion'
+import { HERO_PORTRAIT } from '../data/portraits'
+import { gsap, Flip, DrawSVGPlugin } from '../lib/gsap'
+import { HERO_ARTWORK_ID, MOTION } from '../lib/motion'
 import { useDrawHandoff } from '../context/DrawHandoffContext'
 import { useMotionEnabled } from '../hooks/useMotionEnabled'
+import { DrawOnSvg } from './DrawOnSvg'
+import { HouseLineDrawing } from './HouseDrawings'
 
 export function Preloader({ onComplete }: { onComplete: () => void }) {
   const overlayRef = useRef<HTMLDivElement>(null)
-  const pathRef = useRef<SVGPathElement>(null)
   const motionEnabled = useMotionEnabled()
-  const { setPreloaderComplete } = useDrawHandoff()
+  const {
+    setPreloaderComplete,
+    setFlipComplete,
+    setArtworkReady,
+    setSkippedHandoff,
+    heroTargetRef,
+  } = useDrawHandoff()
   const [visible, setVisible] = useState(motionEnabled)
 
-  const finish = () => {
+  const finish = (skipped = false) => {
+    if (skipped) setSkippedHandoff(true)
     setPreloaderComplete(true)
+    setFlipComplete(true)
+    setArtworkReady(true)
     setVisible(false)
     onComplete()
   }
@@ -21,19 +32,50 @@ export function Preloader({ onComplete }: { onComplete: () => void }) {
   useGSAP(
     () => {
       if (!motionEnabled) {
-        finish()
+        finish(true)
         return
       }
 
-      const path = pathRef.current
       const overlay = overlayRef.current
-      if (!path || !overlay) return
+      const target = heroTargetRef.current
+      const artwork = document.getElementById(HERO_ARTWORK_ID)
+      if (!overlay || !target || !artwork) {
+        finish(true)
+        return
+      }
 
-      const tl = gsap.timeline({ onComplete: finish })
+      const tl = gsap.timeline()
 
-      tl.from(path, { drawSVG: '0%', duration: 1.4, ease: 'power2.inOut' })
-        .from('.preloader-text', { opacity: 0, y: 12, duration: 0.5, stagger: 0.08 }, '-=0.4')
-        .to(overlay, { opacity: 0, duration: 0.6, delay: 0.3 })
+      tl.from('.preloader-text', { opacity: 0, y: 12, duration: 0.5, stagger: 0.08 }, 0.6)
+        .to({}, { duration: 0.35 })
+        .add(() => {
+          const state = Flip.getState(artwork)
+          target.insertBefore(artwork, target.firstChild)
+
+          Flip.from(state, {
+            duration: MOTION.SURPRISE.flipDuration,
+            ease: 'power2.inOut',
+            scale: true,
+            absolute: true,
+            onComplete: () => {
+              gsap.from('.hero-tape', {
+                rotation: (_i, el) => (el.classList.contains('-rotate-45') ? -90 : 90),
+                opacity: 0,
+                duration: 0.5,
+                stagger: 0.12,
+                ease: MOTION.SURPRISE.bounceEase,
+              })
+              setPreloaderComplete(true)
+              setFlipComplete(true)
+              setArtworkReady(true)
+            },
+          })
+        })
+        .to(overlay, { opacity: 0, duration: 0.55, ease: 'power2.inOut' }, '-=0.7')
+        .add(() => {
+          setVisible(false)
+          onComplete()
+        })
     },
     { dependencies: [motionEnabled] },
   )
@@ -44,20 +86,17 @@ export function Preloader({ onComplete }: { onComplete: () => void }) {
     <div
       ref={overlayRef}
       className="fixed inset-0 z-[100] flex cursor-pointer flex-col items-center justify-center bg-paper"
-      onClick={finish}
+      onClick={() => finish(true)}
       role="presentation"
     >
-      <svg width="140" height="110" viewBox="0 0 120 100" aria-hidden="true">
-        <path
-          ref={pathRef}
-          d={HOUSE_PATH}
-          fill="none"
-          stroke="#9c4a32"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <div id={HERO_ARTWORK_ID} className="mat-board w-[min(85vw,320px)] p-5">
+        <DrawOnSvg trigger="load" duration={1.2} stagger={MOTION.stagger.draw}>
+          <HouseLineDrawing className="w-full" />
+        </DrawOnSvg>
+        <p className="mt-3 text-center font-serif text-sm italic text-ink-faint">
+          Fig. 1 — {HERO_PORTRAIT.label}
+        </p>
+      </div>
       <p className="preloader-text mt-8 font-serif text-2xl text-ink">Andraya Studio</p>
       <p className="preloader-text mt-2 text-xs uppercase tracking-[0.3em] text-ink-faint">
         Tap to skip

@@ -3,6 +3,7 @@ import { useRef, useState } from 'react'
 import { AnimatedText } from './AnimatedText'
 import { gsap } from '../lib/gsap'
 import { useScrollReveal } from '../hooks/useScrollReveal'
+import { useMotionEnabled } from '../hooks/useMotionEnabled'
 
 const faqs = [
   {
@@ -35,6 +36,7 @@ export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
   const sectionRef = useRef<HTMLElement>(null)
   const answerRefs = useRef<(HTMLDivElement | null)[]>([])
+  const motionEnabled = useMotionEnabled()
 
   useScrollReveal(sectionRef, '.faq-item')
 
@@ -42,15 +44,30 @@ export function FAQ() {
     () => {
       faqs.forEach((_, i) => {
         const el = answerRefs.current[i]
+        const answerText = el?.querySelector('.faq-answer-text')
         if (!el) return
         if (openIndex === i) {
-          gsap.to(el, { height: 'auto', opacity: 1, duration: 0.4, ease: 'power2.out' })
+          gsap.to(el, { height: 'auto', duration: 0.4, ease: 'power2.out' })
+          if (answerText) {
+            gsap.fromTo(answerText, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35, delay: 0.05 })
+          }
         } else {
-          gsap.to(el, { height: 0, opacity: 0, duration: 0.3, ease: 'power2.in' })
+          gsap.to(el, { height: 0, duration: 0.3, ease: 'power2.in' })
         }
       })
     },
     { dependencies: [openIndex] },
+  )
+
+  useGSAP(
+    () => {
+      if (!motionEnabled) return
+      const firstChevron = sectionRef.current?.querySelector('.faq-chevron-0')
+      if (firstChevron) {
+        gsap.from(firstChevron, { rotation: -90, duration: 0.5, ease: 'power2.out', delay: 0.3 })
+      }
+    },
+    { scope: sectionRef, dependencies: [motionEnabled] },
   )
 
   return (
@@ -64,35 +81,38 @@ export function FAQ() {
         </div>
 
         <div className="mt-12 divide-y divide-border border border-border bg-paper">
-          {faqs.map((faq, i) => (
-            <div key={faq.q} className="faq-item">
-              <button
-                type="button"
-                className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
-                onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                aria-expanded={openIndex === i}
-              >
-                <span className="font-medium text-ink">{faq.q}</span>
-                <svg
-                  className={`h-5 w-5 shrink-0 text-ink-muted transition-transform duration-300 ${openIndex === i ? 'rotate-180' : ''}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+          {faqs.map((faq, i) => {
+            const isOpen = openIndex === i
+            return (
+              <div key={faq.q} className="faq-item">
+                <button
+                  type="button"
+                  className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
+                  onClick={() => setOpenIndex(isOpen ? null : i)}
+                  aria-expanded={isOpen}
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div
-                ref={(el) => {
-                  answerRefs.current[i] = el
-                }}
-                className="overflow-hidden px-6"
-                style={{ height: i === 0 ? 'auto' : 0, opacity: i === 0 ? 1 : 0 }}
-              >
-                <p className="pb-5 text-sm leading-relaxed text-ink-muted">{faq.a}</p>
+                  <span className="font-medium text-ink">{faq.q}</span>
+                  <svg
+                    className={`faq-chevron-${i} h-5 w-5 shrink-0 text-ink-muted transition-transform duration-300 ${isOpen ? 'rotate-45' : ''}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v14M5 12h14" />
+                  </svg>
+                </button>
+                <div
+                  ref={(el) => {
+                    answerRefs.current[i] = el
+                  }}
+                  className="overflow-hidden px-6"
+                  style={{ height: i === 0 ? 'auto' : 0 }}
+                >
+                  <p className="faq-answer-text pb-5 text-sm leading-relaxed text-ink-muted">{faq.a}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </section>

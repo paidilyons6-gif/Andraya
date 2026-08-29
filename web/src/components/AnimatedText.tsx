@@ -1,6 +1,7 @@
 import { useGSAP } from '@gsap/react'
 import { useRef } from 'react'
 import { gsap, SplitText } from '../lib/gsap'
+import { MOTION } from '../lib/motion'
 import { useMotionEnabled } from '../hooks/useMotionEnabled'
 
 type AnimatedTextProps = {
@@ -56,7 +57,7 @@ export function AnimatedText({
           yPercent: 0,
           rotationX: 0,
           duration: mode === 'chars' ? 0.7 : 1,
-          stagger: mode === 'chars' ? 0.025 : mode === 'words' ? 0.06 : 0.1,
+          stagger: mode === 'chars' ? MOTION.SURPRISE.charStagger : mode === 'words' ? 0.06 : 0.1,
           ease: 'expo.out',
           delay,
         }

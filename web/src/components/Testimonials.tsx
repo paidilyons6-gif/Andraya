@@ -17,6 +17,8 @@ export function Testimonials() {
         gsap.from(card, {
           y: 24,
           opacity: 0,
+          rotationY: 8,
+          transformPerspective: 800,
           duration: 0.7,
           ease: 'power2.out',
           scrollTrigger: {
@@ -26,6 +28,19 @@ export function Testimonials() {
           },
           delay: i * 0.1,
         })
+      })
+
+      const quotes = sectionRef.current.querySelectorAll('[data-quote-mark]')
+      gsap.from(quotes, {
+        drawSVG: '0%',
+        duration: 1,
+        stagger: 0.15,
+        ease: 'power2.inOut',
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top 80%',
+          once: true,
+        },
       })
     },
     { scope: sectionRef, dependencies: [motionEnabled] },
@@ -68,6 +83,21 @@ export function Testimonials() {
               className="testimonial-card border border-border bg-paper-warm p-8"
               style={i === 1 ? { transform: 'translateY(1rem)' } : undefined}
             >
+              <svg
+                className="mb-3 h-6 w-6 text-accent/60"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  data-quote-mark
+                  d="M4 4h6v8H6c0 2 2 3 4 4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  fill="none"
+                  strokeLinecap="round"
+                />
+              </svg>
               <p className="font-serif text-lg italic leading-relaxed text-ink">
                 "{quote.text}"
               </p>

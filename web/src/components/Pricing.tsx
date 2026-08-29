@@ -1,10 +1,14 @@
 import { useGSAP } from '@gsap/react'
-import { useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { AnimatedText } from './AnimatedText'
+import { DrawingReveal } from './DrawingReveal'
 import { HomePortrait } from './HomePortrait'
 import { HERO_PORTRAIT } from '../data/portraits'
 import type { PortraitStyle } from '../data/portraits'
 import { gsap } from '../lib/gsap'
+import { MOTION } from '../lib/motion'
+import { usePinnedTimeline } from '../hooks/usePinnedTimeline'
+import { useCountUp } from '../hooks/useScrollReveal'
 import { useMotionEnabled } from '../hooks/useMotionEnabled'
 
 type Tier = 'line' | 'shaded' | 'color'
@@ -74,7 +78,17 @@ const sizes = [
   { label: '18×24"', addon: 85 },
 ]
 
-function LayeredPreview({ tier }: { tier: Tier }) {
+function LayeredPreview({
+  tier,
+  redrawKey,
+  scrollProgressRef,
+  pinRef,
+}: {
+  tier: Tier
+  redrawKey: number
+  scrollProgressRef?: React.RefObject<number>
+  pinRef?: React.RefObject<HTMLDivElement | null>
+}) {
   const ref = useRef<HTMLDivElement>(null)
   const motionEnabled = useMotionEnabled()
 
@@ -91,20 +105,61 @@ function LayeredPreview({ tier }: { tier: Tier }) {
     { scope: ref, dependencies: [tier, motionEnabled] },
   )
 
+  useGSAP(
+    () => {
+      if (!motionEnabled || !ref.current || !scrollProgressRef) return
+
+      const layers = ref.current.querySelectorAll<HTMLElement>('[data-tier-layer]')
+      const update = (p: number) => {
+        const lineOp = p < 0.33 ? 1 : Math.max(0, 1 - (p - 0.33) / 0.15)
+        const shadeOp = p < 0.33 ? p / 0.33 : p < 0.66 ? 1 : Math.max(0, 1 - (p - 0.66) / 0.15)
+        const colorOp = p < 0.66 ? Math.max(0, (p - 0.5) / 0.16) : 1
+        layers.forEach((el) => {
+          const t = el.getAttribute('data-tier-layer')
+          const op = t === 'line' ? lineOp : t === 'shaded' ? shadeOp : colorOp
+          gsap.set(el, { opacity: op })
+        })
+      }
+
+      const st = gsap.timeline({
+        scrollTrigger: {
+          trigger: pinRef?.current ?? ref.current,
+          start: 'top top',
+          end: MOTION.pricingPinLength,
+          scrub: 0.5,
+          onUpdate: (self) => {
+            if (scrollProgressRef) scrollProgressRef.current = self.progress
+            update(self.progress)
+          },
+        },
+      })
+      return () => st.scrollTrigger?.kill()
+    },
+    { scope: ref, dependencies: [motionEnabled, scrollProgressRef, pinRef] },
+  )
+
   return (
     <div ref={ref} className="relative aspect-[4/3] overflow-hidden border border-border bg-paper">
       {(['line', 'shaded', 'color'] as Tier[]).map((t) => (
         <div
-          key={t}
+          key={`${t}-${redrawKey}`}
           data-tier-layer={t}
           className="absolute inset-0"
           style={{ opacity: tier === t ? 1 : 0 }}
         >
-          <HomePortrait portrait={HERO_PORTRAIT} variant={t} />
+          <DrawingReveal trigger="load" duration={0.9} delay={0}>
+            <HomePortrait portrait={HERO_PORTRAIT} variant={t} />
+          </DrawingReveal>
         </div>
       ))}
     </div>
   )
+}
+
+function PriceDisplay({ price }: { price: number }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  useCountUp(ref, price)
+  return <span ref={ref} className="font-serif text-4xl font-medium text-ink" />
 }
 
 function PricingCard({
@@ -144,7 +199,7 @@ function PricingCard({
       <p className="text-xs uppercase tracking-wider text-ink-faint">{tier.tagline}</p>
       <h3 className="mt-1 font-serif text-2xl font-medium text-ink">{tier.name}</h3>
       <div className="mt-2 flex items-baseline gap-1">
-        <span className="font-serif text-4xl font-medium text-ink">${tier.price}</span>
+        <PriceDisplay price={tier.price} />
         <span className="text-sm text-ink-muted">USD</span>
       </div>
       <p className="mt-3 text-sm leading-relaxed text-ink-muted">{tier.description}</p>
@@ -173,7 +228,26 @@ function PricingCard({
 
 export function Pricing() {
   const [selected, setSelected] = useState<Tier>('shaded')
+  const [redrawKey, setRedrawKey] = useState(0)
   const sectionRef = useRef<HTMLElement>(null)
+  const previewSectionRef = useRef<HTMLDivElement>(null)
+  const scrollProgressRef = useRef(0)
+  const motionEnabled = useMotionEnabled()
+
+  const buildTimeline = useCallback((tl: gsap.core.Timeline) => {
+    tl.to({}, { duration: 1 })
+  }, [])
+
+  usePinnedTimeline(
+    previewSectionRef,
+    { end: MOTION.pricingPinLength, onTimeline: buildTimeline },
+    motionEnabled,
+  )
+
+  const handleSelect = (tier: Tier) => {
+    setSelected(tier)
+    setRedrawKey((k) => k + 1)
+  }
 
   return (
     <section id="styles" ref={sectionRef} className="border-b border-border py-20 lg:py-28">
@@ -194,9 +268,14 @@ export function Pricing() {
           </p>
         </div>
 
-        <div className="mt-12 hidden lg:block">
+        <div ref={previewSectionRef} className="pricing-preview-pin mt-12 hidden lg:block">
           <div className="mat-board mx-auto max-w-lg p-6">
-            <LayeredPreview tier={selected} />
+            <LayeredPreview
+              tier={selected}
+              redrawKey={redrawKey}
+              scrollProgressRef={scrollProgressRef}
+              pinRef={previewSectionRef}
+            />
             <p className="mt-4 text-center font-serif text-sm italic text-ink-faint">
               {HERO_PORTRAIT.label}, {HERO_PORTRAIT.location} —{' '}
               {tiers.find((t) => t.id === selected)?.name}
@@ -210,7 +289,7 @@ export function Pricing() {
               key={tier.id}
               tier={tier}
               isSelected={selected === tier.id}
-              onSelect={() => setSelected(tier.id)}
+              onSelect={() => handleSelect(tier.id)}
             />
           ))}
         </div>

@@ -11,6 +11,7 @@ function SpotlightRig({ progressRef }: GallerySceneProps) {
   const spotRef = useRef<THREE.SpotLight>(null)
   const targetRef = useRef<THREE.Object3D>(null)
   const dustRef = useRef<THREE.Points>(null)
+  const vignetteRef = useRef<THREE.Mesh>(null)
   const { scene } = useThree()
 
   useEffect(() => {
@@ -38,6 +39,7 @@ function SpotlightRig({ progressRef }: GallerySceneProps) {
     const spot = spotRef.current
     const target = targetRef.current
     const dust = dustRef.current
+    const vignette = vignetteRef.current
     if (!spot || !target) return
 
     const x = -4 + p * 10
@@ -49,6 +51,11 @@ function SpotlightRig({ progressRef }: GallerySceneProps) {
     if (dust) {
       dust.rotation.y = clock.elapsedTime * 0.02
       dust.position.x = x * 0.3
+    }
+
+    if (vignette) {
+      const mat = vignette.material as THREE.MeshBasicMaterial
+      mat.opacity = 0.15 + p * 0.55
     }
   })
 
@@ -69,6 +76,15 @@ function SpotlightRig({ progressRef }: GallerySceneProps) {
       <mesh position={[0, 0, -3]} rotation={[0, 0, 0]}>
         <planeGeometry args={[24, 14]} />
         <meshStandardMaterial color={COLORS.galleryWall} roughness={0.95} metalness={0} />
+      </mesh>
+      <mesh ref={vignetteRef} position={[0, 0, 1]}>
+        <planeGeometry args={[24, 14]} />
+        <meshBasicMaterial
+          color="#000000"
+          transparent
+          opacity={0.2}
+          depthWrite={false}
+        />
       </mesh>
       <points ref={dustRef} geometry={dustGeometry}>
         <pointsMaterial

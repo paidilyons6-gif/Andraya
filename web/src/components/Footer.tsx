@@ -1,7 +1,46 @@
+import { useGSAP } from '@gsap/react'
+import { useRef } from 'react'
+import { gsap } from '../lib/gsap'
+import { useMotionEnabled } from '../hooks/useMotionEnabled'
+
 export function Footer() {
+  const footerRef = useRef<HTMLElement>(null)
+  const lineRef = useRef<SVGLineElement>(null)
+  const motionEnabled = useMotionEnabled()
+
+  useGSAP(
+    () => {
+      const line = lineRef.current
+      if (!line || !motionEnabled || !footerRef.current) return
+
+      gsap.from(line, {
+        drawSVG: '0%',
+        duration: 1.2,
+        ease: 'power2.inOut',
+        scrollTrigger: {
+          trigger: footerRef.current,
+          start: 'top 90%',
+          once: true,
+        },
+      })
+    },
+    { scope: footerRef, dependencies: [motionEnabled] },
+  )
+
   return (
-    <footer className="border-t border-border bg-paper-warm py-16">
+    <footer ref={footerRef} className="border-t border-border bg-paper-warm py-16">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
+        <svg className="mb-12 h-px w-full" viewBox="0 0 1000 1" preserveAspectRatio="none" aria-hidden="true">
+          <line
+            ref={lineRef}
+            x1="0"
+            y1="0.5"
+            x2="1000"
+            y2="0.5"
+            stroke="#9c4a32"
+            strokeWidth="1"
+          />
+        </svg>
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
             <p className="font-serif text-2xl font-medium text-ink">Andraya</p>

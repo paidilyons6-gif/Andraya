@@ -1,7 +1,9 @@
 import { useGSAP } from '@gsap/react'
 import { useRef, useState } from 'react'
 import { AnimatedText } from './AnimatedText'
-import { gsap } from '../lib/gsap'
+import { InkBurst } from './InkBurst'
+import { gsap, DrawSVGPlugin } from '../lib/gsap'
+import { MOTION } from '../lib/motion'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 import { useMotionEnabled } from '../hooks/useMotionEnabled'
 
@@ -16,10 +18,54 @@ const styleLabels: Record<Style, string> = {
 const inputClass =
   'mt-1.5 w-full rounded-sm border border-border bg-paper px-4 py-3 text-ink outline-none transition-colors ink-focus'
 
+function SuccessCheckmark() {
+  const ref = useRef<SVGSVGElement>(null)
+  const motionEnabled = useMotionEnabled()
+
+  useGSAP(
+    () => {
+      const svg = ref.current
+      if (!svg || !motionEnabled) return
+      const paths = svg.querySelectorAll('[data-draw]')
+      gsap.from(paths, {
+        drawSVG: '0%',
+        duration: 0.8,
+        stagger: 0.15,
+        ease: 'power2.out',
+      })
+    },
+    { scope: ref, dependencies: [motionEnabled] },
+  )
+
+  return (
+    <svg ref={ref} className="h-7 w-7" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle
+        data-draw
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="2"
+        fill="none"
+      />
+      <path
+        data-draw
+        d="M8 12l3 3 5-6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </svg>
+  )
+}
+
 export function OrderSection() {
   const [submitted, setSubmitted] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
+  const successRef = useRef<HTMLDivElement>(null)
   const motionEnabled = useMotionEnabled()
   useScrollReveal(sectionRef, '.order-reveal')
 
@@ -49,6 +95,18 @@ export function OrderSection() {
       })
     },
     { scope: formRef, dependencies: [motionEnabled, submitted] },
+  )
+
+  useGSAP(
+    () => {
+      if (!submitted || !successRef.current || !motionEnabled) return
+      gsap.fromTo(
+        successRef.current,
+        { scale: 0.92 },
+        { scale: 1, duration: 0.5, ease: MOTION.SURPRISE.bounceEase },
+      )
+    },
+    { dependencies: [submitted, motionEnabled] },
   )
 
   function handleSubmit(e: React.FormEvent) {
@@ -94,31 +152,33 @@ export function OrderSection() {
             </div>
           </div>
 
-          <div className="order-reveal mat-board p-8">
+          <div className="order-reveal mat-board relative p-8">
             {submitted ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-accent text-accent">
-                  <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+              <div
+                ref={successRef}
+                className="relative flex flex-col items-center justify-center py-12 text-center"
+              >
+                <InkBurst trigger={submitted} />
+                <div className="relative z-10 mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-accent text-accent">
+                  <SuccessCheckmark />
                 </div>
                 <AnimatedText
                   as="h3"
                   mode="chars"
                   trigger="load"
                   animateKey={submitted}
-                  className="font-serif text-2xl font-medium text-ink"
+                  className="relative z-10 font-serif text-2xl font-medium text-ink"
                 >
                   Request received!
                 </AnimatedText>
-                <p className="mt-2 max-w-sm text-ink-muted">
+                <p className="relative z-10 mt-2 max-w-sm text-ink-muted">
                   Thank you, {form.name.split(' ')[0] || 'friend'}. We will email you within 24 hours
                   with upload instructions and payment details.
                 </p>
                 <button
                   type="button"
                   onClick={() => setSubmitted(false)}
-                  className="mt-6 text-sm font-medium text-accent underline underline-offset-4 hover:text-accent-hover"
+                  className="relative z-10 mt-6 text-sm font-medium text-accent underline underline-offset-4 hover:text-accent-hover"
                 >
                   Submit another request
                 </button>
@@ -209,3 +269,5 @@ export function OrderSection() {
     </section>
   )
 }
+
+export { DrawSVGPlugin as _OrderDrawSVGPlugin }
