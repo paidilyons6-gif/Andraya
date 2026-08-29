@@ -1,9 +1,18 @@
 export type PortraitStyle = 'photo' | 'line' | 'shaded' | 'color'
 
+export type ArchitectureType =
+  | 'craftsman'
+  | 'victorian'
+  | 'cottage'
+  | 'modern'
+  | 'colonial'
+  | 'brownstone'
+
 export type Portrait = {
   id: string
   label: string
   location: string
+  architecture: ArchitectureType
   /** Path under public/ — resolved with import.meta.env.BASE_URL */
   photo: string
 }
@@ -14,42 +23,49 @@ export const PORTRAITS: Record<string, Portrait> = {
     id: 'craftsman-portland',
     label: 'Craftsman bungalow',
     location: 'Portland, OR',
+    architecture: 'craftsman',
     photo: 'portraits/craftsman-portland.jpg',
   },
   victorianPortland: {
     id: 'victorian-portland',
     label: 'Victorian revival',
     location: 'Portland, OR',
+    architecture: 'victorian',
     photo: 'portraits/victorian-portland.jpg',
   },
   cottageAsheville: {
     id: 'cottage-asheville',
     label: 'Country cottage',
     location: 'Asheville, NC',
+    architecture: 'cottage',
     photo: 'portraits/cottage-asheville.jpg',
   },
   modernPalmSprings: {
     id: 'modern-palm-springs',
     label: 'Mid-century modern',
     location: 'Palm Springs, CA',
+    architecture: 'modern',
     photo: 'portraits/modern-palm-springs.jpg',
   },
   craftsmanSeattle: {
     id: 'craftsman-seattle',
     label: 'Craftsman bungalow',
     location: 'Seattle, WA',
+    architecture: 'craftsman',
     photo: 'portraits/craftsman-seattle.jpg',
   },
   colonialCharleston: {
     id: 'colonial-charleston',
     label: 'Colonial estate',
     location: 'Charleston, SC',
+    architecture: 'colonial',
     photo: 'portraits/colonial-charleston.jpg',
   },
   brownstoneBrooklyn: {
     id: 'brownstone-brooklyn',
     label: 'Urban brownstone',
     location: 'Brooklyn, NY',
+    architecture: 'brownstone',
     photo: 'portraits/brownstone-brooklyn.jpg',
   },
 }

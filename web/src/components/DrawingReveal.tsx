@@ -30,24 +30,25 @@ export function DrawingReveal({
       const el = ref.current
       if (!el || !motionEnabled) return
 
-      gsap.set(el, { clipPath: 'inset(0 100% 0 0)' })
-
-      const tweenVars: gsap.TweenVars = {
-        clipPath: 'inset(0 0% 0 0)',
-        duration,
-        delay,
-        ease: 'power2.inOut',
-      }
-
-      if (trigger === 'scroll') {
-        tweenVars.scrollTrigger = {
-          trigger: el,
-          start: 'top 78%',
-          once: true,
-        }
-      }
-
-      gsap.to(el, tweenVars)
+      gsap.fromTo(
+        el,
+        { clipPath: 'inset(0 100% 0 0)' },
+        {
+          clipPath: 'inset(0 0% 0 0)',
+          duration,
+          delay,
+          ease: 'power2.inOut',
+          ...(trigger === 'scroll'
+            ? {
+                scrollTrigger: {
+                  trigger: el,
+                  start: 'top 85%',
+                  once: true,
+                },
+              }
+            : {}),
+        },
+      )
     },
     { scope: ref, dependencies: [motionEnabled, trigger, delay, duration] },
   )

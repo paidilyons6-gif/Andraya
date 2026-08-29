@@ -46,8 +46,9 @@ export function LenisProvider({ children }: { children: ReactNode }) {
       ref={lenisRef}
       options={{
         autoRaf: false,
-        lerp: 0.08,
+        lerp: 0.14,
         smoothWheel: true,
+        touchMultiplier: 1.2,
       }}
     >
       {children}

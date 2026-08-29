@@ -11,26 +11,8 @@ import { useMotionEnabled } from '../hooks/useMotionEnabled'
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null)
-  const frameRef = useRef<HTMLDivElement>(null)
   const motionEnabled = useMotionEnabled()
   const { preloaderComplete } = useDrawHandoff()
-
-  useGSAP(
-    () => {
-      if (!motionEnabled || !frameRef.current) return
-      gsap.to(frameRef.current, {
-        y: -32,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: 1,
-        },
-      })
-    },
-    { scope: sectionRef, dependencies: [motionEnabled] },
-  )
 
   useGSAP(
     () => {
@@ -93,7 +75,7 @@ export function Hero() {
         </div>
 
         <div>
-          <div ref={frameRef} className="relative mx-auto max-w-md will-change-transform lg:ml-auto">
+          <div className="relative mx-auto max-w-md lg:ml-auto">
             <div className="mat-board relative p-5 sm:p-6">
               <div className="tape-corner absolute -left-2 top-8 h-8 w-5 -rotate-45" aria-hidden="true" />
               <div className="tape-corner absolute -right-2 top-12 h-8 w-5 rotate-45" aria-hidden="true" />
