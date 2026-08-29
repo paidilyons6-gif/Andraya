@@ -1,6 +1,7 @@
 import { useGSAP } from '@gsap/react'
 import { useCallback, useRef } from 'react'
 import { HomePortrait } from './HomePortrait'
+import { SectionHeader } from './SectionHeader'
 import { HERO_PORTRAIT } from '../data/portraits'
 import { gsap, SplitText } from '../lib/gsap'
 import { MOTION } from '../lib/motion'
@@ -187,8 +188,11 @@ export function ProcessStory() {
 
       <div className="border-b border-border lg:hidden">
         <div className="mx-auto max-w-6xl px-6 py-16">
-          <p className="text-sm text-ink-faint">The process</p>
-          <h2 className="mt-2 font-serif text-3xl font-medium text-ink">How it works</h2>
+          <SectionHeader
+            eyebrow="The process"
+            title="How it works"
+            description="From your front-door snapshot to a framed portrait — four simple steps."
+          />
         </div>
         <div className="space-y-16 px-6 pb-20">
           {chapters.map((ch, i) => (

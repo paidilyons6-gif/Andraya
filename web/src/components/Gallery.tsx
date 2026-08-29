@@ -1,7 +1,7 @@
 import { Suspense, lazy, useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react'
-import { AnimatedText } from './AnimatedText'
 import { HomePortrait } from './HomePortrait'
+import { SectionHeader } from './SectionHeader'
 import { GALLERY_PORTRAITS } from '../data/portraits'
 import { gsap, ScrollTrigger } from '../lib/gsap'
 import { MOTION } from '../lib/motion'
@@ -185,18 +185,13 @@ export function Gallery() {
 
         <div className="gallery-wall relative z-10 min-h-screen overflow-hidden">
           <div className="mx-auto max-w-6xl px-8 pt-20 pb-8">
-            <p className="text-xs uppercase tracking-[0.25em] text-gallery-muted">Portfolio</p>
-            <AnimatedText
-              as="h2"
-              mode="chars"
-              trigger="scroll"
-              className="mt-3 font-serif text-4xl font-medium text-gallery-spot sm:text-5xl"
-            >
-              Recent commissions
-            </AnimatedText>
-            <p className="mt-4 max-w-lg text-base text-gallery-muted">
-              Real homes, real clients — each portrait drawn by hand from a front-facing photo.
-            </p>
+            <SectionHeader
+              eyebrow="Portfolio"
+              title="Recent commissions"
+              description="Real homes, real clients — each portrait drawn by hand from a front-facing photo."
+              titleMode="chars"
+              dark
+            />
           </div>
 
           <div className="relative pb-24">
@@ -233,11 +228,12 @@ export function Gallery() {
       </div>
 
       <div className="gallery-wall border-b border-border px-6 py-16 lg:hidden">
-        <p className="text-xs uppercase tracking-[0.25em] text-gallery-muted">Portfolio</p>
-        <h2 className="mt-3 font-serif text-3xl font-medium text-gallery-spot">Recent commissions</h2>
-        <p className="mt-4 text-sm text-gallery-muted">
-          Real homes, real clients — each portrait drawn by hand from a front-facing photo.
-        </p>
+        <SectionHeader
+          eyebrow="Portfolio"
+          title="Recent commissions"
+          description="Real homes, real clients — each portrait drawn by hand from a front-facing photo."
+          dark
+        />
         <div className="mt-10 space-y-8">
           {GALLERY_PORTRAITS.map((item) => (
             <article key={item.title} className="gallery-card">

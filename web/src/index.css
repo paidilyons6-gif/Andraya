@@ -4,26 +4,26 @@
   --font-serif: "Cormorant Garamond", Georgia, serif;
   --font-sans: "DM Sans", system-ui, sans-serif;
 
-  /* Studio palette */
-  --color-paper: #f7f3ed;
-  --color-paper-warm: #efe9df;
-  --color-paper-deep: #e5ddd2;
-  --color-studio: #ebe6dc;
-  --color-ink: #2c2825;
-  --color-ink-muted: #6b6560;
-  --color-ink-faint: #9c9690;
-  --color-accent: #9c4a32;
-  --color-accent-hover: #7d3a28;
-  --color-accent-soft: #f0e4dc;
-  --color-sage: #5c6b5a;
-  --color-border: #ddd5ca;
-  --color-border-dark: #c9bfb2;
+  /* Studio palette — refined professional tones */
+  --color-paper: #f8f5f0;
+  --color-paper-warm: #f0ebe3;
+  --color-paper-deep: #e6dfd4;
+  --color-studio: #eeeae3;
+  --color-ink: #1f1c1a;
+  --color-ink-muted: #5c5651;
+  --color-ink-faint: #8a837c;
+  --color-accent: #8f3f2b;
+  --color-accent-hover: #723021;
+  --color-accent-soft: #ede0d8;
+  --color-sage: #4d5c4b;
+  --color-border: #ddd6cb;
+  --color-border-dark: #c4b9ab;
 
-  /* Hybrid gallery moment */
-  --color-gallery-bg: #1a1816;
-  --color-gallery-wall: #242120;
+  /* Gallery moment */
+  --color-gallery-bg: #141210;
+  --color-gallery-wall: #1e1c1a;
   --color-gallery-spot: #f5efe6;
-  --color-gallery-muted: #9c9690;
+  --color-gallery-muted: #a39d96;
 
   /* Motion tokens */
   --motion-draw: 1.4s;
@@ -48,11 +48,12 @@
 
   body {
     @apply bg-paper text-ink font-sans antialiased;
+    font-feature-settings: "kern" 1, "liga" 1;
   }
 
   ::selection {
-    background: rgba(156, 74, 50, 0.18);
-    color: #2c2825;
+    background: rgba(143, 63, 43, 0.16);
+    color: #1f1c1a;
   }
 }
 
@@ -62,25 +63,47 @@
   }
 
   .paper-grain {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-repeat: repeat;
-    background-size: 200px 200px;
+    background-size: 220px 220px;
   }
 
   .section-studio {
     background-color: var(--color-studio);
   }
 
+  .section-eyebrow {
+    @apply font-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-accent;
+  }
+
+  .section-rule {
+    @apply h-px w-8 shrink-0 bg-accent;
+  }
+
+  .section-rule-light {
+    @apply bg-gallery-spot/40;
+  }
+
+  .section-title {
+    @apply font-serif text-3xl font-medium leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem];
+  }
+
+  .section-lead {
+    @apply text-base leading-relaxed;
+  }
+
   .mat-board {
-    background: #faf8f4;
+    background: linear-gradient(165deg, #fcfaf6 0%, #f5f1ea 100%);
+    border: 1px solid rgba(196, 185, 171, 0.45);
     box-shadow:
-      0 1px 2px rgba(44, 40, 37, 0.06),
-      0 8px 24px rgba(44, 40, 37, 0.08);
+      0 1px 0 rgba(255, 255, 255, 0.6) inset,
+      0 1px 2px rgba(31, 28, 26, 0.04),
+      0 12px 32px rgba(31, 28, 26, 0.07);
   }
 
   .tape-corner {
-    background: rgba(232, 220, 200, 0.85);
-    box-shadow: 0 1px 2px rgba(44, 40, 37, 0.1);
+    background: rgba(228, 216, 198, 0.92);
+    box-shadow: 0 1px 2px rgba(31, 28, 26, 0.08);
   }
 
   .gallery-wall {
@@ -94,7 +117,23 @@
   .ink-focus:focus {
     outline: none;
     border-color: var(--color-accent);
-    box-shadow: 0 0 0 1px rgba(156, 74, 50, 0.25);
+    box-shadow: 0 0 0 3px rgba(143, 63, 43, 0.12);
+  }
+
+  .brand-badge {
+    @apply inline-flex items-center gap-2.5 rounded-full border border-border bg-paper/80 px-4 py-2 backdrop-blur-sm;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-sm bg-ink px-7 py-3.5 text-sm font-medium text-paper transition-all hover:bg-ink/90 hover:shadow-md;
+  }
+
+  .btn-accent {
+    @apply inline-flex items-center justify-center rounded-sm bg-accent px-7 py-3.5 text-sm font-medium text-paper transition-all hover:bg-accent-hover hover:shadow-md;
+  }
+
+  .card-pro {
+    @apply rounded-sm border border-border bg-paper shadow-sm transition-shadow hover:shadow-md;
   }
 }
 

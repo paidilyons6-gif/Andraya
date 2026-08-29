@@ -1,8 +1,8 @@
 import { useGSAP } from '@gsap/react'
 import { useCallback, useRef, useState } from 'react'
-import { AnimatedText } from './AnimatedText'
 import { DrawingReveal } from './DrawingReveal'
 import { HomePortrait } from './HomePortrait'
+import { SectionHeader } from './SectionHeader'
 import { HERO_PORTRAIT } from '../data/portraits'
 import type { PortraitStyle } from '../data/portraits'
 import { gsap } from '../lib/gsap'
@@ -253,16 +253,11 @@ export function Pricing() {
     <section id="styles" ref={sectionRef} className="border-b border-border py-20 lg:py-28">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
-          <div>
-            <p className="text-sm text-ink-faint">Styles & pricing</p>
-            <AnimatedText
-              as="h2"
-              className="mt-2 font-serif text-3xl font-medium text-ink sm:text-4xl lg:text-5xl"
-            >
-              Choose your illustration style
-            </AnimatedText>
-          </div>
-          <p className="max-w-md text-base leading-relaxed text-ink-muted lg:pb-2">
+          <SectionHeader
+            eyebrow="Styles & pricing"
+            title="Choose your illustration style"
+          />
+          <p className="max-w-md text-base leading-relaxed text-ink-muted lg:pb-2 lg:pt-8">
             Same home, three ways — from precise ink lines to full watercolor. Every style is drawn
             from your photo by hand.
           </p>

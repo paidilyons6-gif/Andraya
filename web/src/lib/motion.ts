@@ -29,12 +29,12 @@ export const MOTION = {
 } as const
 
 export const COLORS = {
-  paper: '#f7f3ed',
-  ink: '#2c2825',
-  accent: '#9c4a32',
-  galleryBg: '#1a1816',
+  paper: '#f8f5f0',
+  ink: '#1f1c1a',
+  accent: '#8f3f2b',
+  galleryBg: '#141210',
   gallerySpot: '#f5efe6',
-  galleryWall: '#242120',
+  galleryWall: '#1e1c1a',
 } as const
 
 export const HOUSE_PATH =

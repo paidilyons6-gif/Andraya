@@ -1,12 +1,13 @@
 import { useGSAP } from '@gsap/react'
 import { useEffect, useRef, useState } from 'react'
 import { gsap, ScrollTrigger } from '../lib/gsap'
+import { Logo } from './Logo'
 import { MagneticButton } from './MagneticButton'
 
 const links = [
   { href: '#how-it-works', label: 'Process' },
   { href: '#styles', label: 'Pricing' },
-  { href: '#gallery', label: 'Work' },
+  { href: '#gallery', label: 'Portfolio' },
   { href: '#order', label: 'Order' },
   { href: '#faq', label: 'FAQ' },
 ]
@@ -88,43 +89,41 @@ export function Header() {
   return (
     <header
       ref={headerRef}
-      className={`sticky top-0 z-50 border-b transition-colors duration-300 ${
-        scrolled ? 'border-border bg-paper/95 backdrop-blur-sm' : 'border-transparent bg-paper/80'
+      className={`sticky top-0 z-50 border-b transition-all duration-300 ${
+        scrolled
+          ? 'border-border bg-paper/95 shadow-sm backdrop-blur-md'
+          : 'border-transparent bg-paper/70 backdrop-blur-sm'
       }`}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 lg:px-8">
-        <a href="#" className="font-serif text-xl font-semibold text-ink">
-          Andraya
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5 lg:px-8">
+        <a href="#" className="group transition-opacity hover:opacity-90" aria-label="Andraya Studio — Home">
+          <Logo variant="full" size="sm" />
         </a>
 
-        <nav ref={navRef} className="hidden items-center gap-7 md:flex">
+        <nav ref={navRef} className="hidden items-center gap-8 md:flex">
           {links.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className={`relative text-sm transition-colors ${
+              className={`relative text-[13px] tracking-wide transition-colors ${
                 active === link.href ? 'font-medium text-ink' : 'text-ink-muted hover:text-ink'
               }`}
             >
               {link.label}
               <span
-                className="nav-link-underline absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-accent"
+                className="nav-link-underline absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-accent"
                 aria-hidden="true"
               />
             </a>
           ))}
-          <MagneticButton
-            href="#order"
-            strength={0.2}
-            className="rounded-sm bg-ink px-4 py-2 text-sm font-medium text-paper transition-colors hover:bg-ink/90"
-          >
-            Order
+          <MagneticButton href="#order" strength={0.2} className="btn-primary px-5 py-2.5 text-[13px]">
+            Commission
           </MagneticButton>
         </nav>
 
         <button
           type="button"
-          className="p-2 md:hidden"
+          className="rounded-sm p-2.5 transition-colors hover:bg-paper-warm md:hidden"
           aria-label="Menu"
           onClick={() => setOpen(!open)}
         >
@@ -135,13 +134,28 @@ export function Header() {
       </div>
 
       {open && (
-        <nav className="border-t border-border bg-paper px-6 py-4 md:hidden">
-          <div className="flex flex-col gap-3">
+        <nav className="border-t border-border bg-paper px-6 py-5 md:hidden">
+          <div className="mb-5 flex justify-center">
+            <Logo variant="full" size="md" />
+          </div>
+          <div className="flex flex-col gap-1">
             {links.map((link) => (
-              <a key={link.href} href={link.href} className="text-ink-muted" onClick={() => setOpen(false)}>
+              <a
+                key={link.href}
+                href={link.href}
+                className="rounded-sm px-3 py-2.5 text-ink-muted transition-colors hover:bg-paper-warm hover:text-ink"
+                onClick={() => setOpen(false)}
+              >
                 {link.label}
               </a>
             ))}
+            <a
+              href="#order"
+              className="btn-accent mt-3 text-center"
+              onClick={() => setOpen(false)}
+            >
+              Commission a drawing
+            </a>
           </div>
         </nav>
       )}

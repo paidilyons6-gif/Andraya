@@ -1,6 +1,7 @@
 import { useGSAP } from '@gsap/react'
 import { useRef, useState } from 'react'
 import { AnimatedText } from './AnimatedText'
+import { SectionHeader } from './SectionHeader'
 import { InkBurst } from './InkBurst'
 import { gsap, DrawSVGPlugin } from '../lib/gsap'
 import { MOTION } from '../lib/motion'
@@ -119,17 +120,11 @@ export function OrderSection() {
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
           <div className="order-reveal">
-            <p className="text-sm text-ink-faint">Get started</p>
-            <AnimatedText
-              as="h2"
-              className="mt-2 font-serif text-3xl font-medium text-ink sm:text-4xl"
-            >
-              Commission your home portrait
-            </AnimatedText>
-            <p className="mt-4 text-base leading-relaxed text-ink-muted">
-              Fill out the form and we will send a confirmation with next steps for uploading your
-              photo and completing payment. No charge until you approve the final artwork.
-            </p>
+            <SectionHeader
+              eyebrow="Get started"
+              title="Commission your home portrait"
+              description="Fill out the form and we will send a confirmation with next steps for uploading your photo and completing payment. No charge until you approve the final artwork."
+            />
 
             <div className="mt-10 space-y-5">
               {[

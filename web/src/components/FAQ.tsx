@@ -1,6 +1,6 @@
 import { useGSAP } from '@gsap/react'
 import { useRef, useState } from 'react'
-import { AnimatedText } from './AnimatedText'
+import { SectionHeader } from './SectionHeader'
 import { gsap } from '../lib/gsap'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 import { useMotionEnabled } from '../hooks/useMotionEnabled'
@@ -73,12 +73,7 @@ export function FAQ() {
   return (
     <section id="faq" ref={sectionRef} className="section-studio py-20 lg:py-24">
       <div className="mx-auto max-w-3xl px-6 lg:px-8">
-        <div className="text-center">
-          <p className="text-sm text-ink-faint">FAQ</p>
-          <AnimatedText as="h2" className="mt-2 font-serif text-3xl font-medium text-ink sm:text-4xl">
-            Common questions
-          </AnimatedText>
-        </div>
+        <SectionHeader eyebrow="FAQ" title="Common questions" align="center" className="max-w-xl" />
 
         <div className="mt-12 divide-y divide-border border border-border bg-paper">
           {faqs.map((faq, i) => {

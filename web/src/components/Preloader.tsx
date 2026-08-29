@@ -7,6 +7,7 @@ import { useDrawHandoff } from '../context/DrawHandoffContext'
 import { useMotionEnabled } from '../hooks/useMotionEnabled'
 import { DrawOnSvg } from './DrawOnSvg'
 import { HouseLineDrawing } from './HouseDrawings'
+import { Logo } from './Logo'
 
 export function Preloader({ onComplete }: { onComplete: () => void }) {
   const overlayRef = useRef<HTMLDivElement>(null)
@@ -97,8 +98,10 @@ export function Preloader({ onComplete }: { onComplete: () => void }) {
           Fig. 1 — {HERO_PORTRAIT.label}
         </p>
       </div>
-      <p className="preloader-text mt-8 font-serif text-2xl text-ink">Andraya Studio</p>
-      <p className="preloader-text mt-2 text-xs uppercase tracking-[0.3em] text-ink-faint">
+      <div className="preloader-text mt-10">
+        <Logo variant="full" size="lg" />
+      </div>
+      <p className="preloader-text mt-4 text-[11px] font-medium uppercase tracking-[0.28em] text-ink-faint">
         Tap to skip
       </p>
     </div>

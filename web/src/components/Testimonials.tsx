@@ -1,6 +1,6 @@
 import { useGSAP } from '@gsap/react'
 import { useRef } from 'react'
-import { AnimatedText } from './AnimatedText'
+import { SectionHeader } from './SectionHeader'
 import { gsap } from '../lib/gsap'
 import { useMotionEnabled } from '../hooks/useMotionEnabled'
 
@@ -67,15 +67,7 @@ export function Testimonials() {
   return (
     <section ref={sectionRef} className="border-b border-border py-20 lg:py-24">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
-        <div className="max-w-lg">
-          <p className="text-sm text-ink-faint">Kind words</p>
-          <AnimatedText
-            as="h2"
-            className="mt-2 font-serif text-3xl font-medium text-ink sm:text-4xl"
-          >
-            What our clients say
-          </AnimatedText>
-        </div>
+        <SectionHeader eyebrow="Kind words" title="What our clients say" />
         <div className="mt-12 grid gap-8 md:grid-cols-3">
           {quotes.map((quote, i) => (
             <blockquote
