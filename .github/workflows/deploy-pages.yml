@@ -1,8 +1,13 @@
 name: Deploy site to GitHub Pages
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - '.github/workflows/deploy-pages.yml'
   push:
-    branches: [main, cursor/home-drawing-website-4845]
+    branches: [main]
     paths:
       - 'web/**'
       - '.github/workflows/deploy-pages.yml'
@@ -37,12 +42,15 @@ jobs:
           npm ci
           npm run build
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Upload Pages artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
         with:
           path: web/dist
 
   deploy:
     needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
